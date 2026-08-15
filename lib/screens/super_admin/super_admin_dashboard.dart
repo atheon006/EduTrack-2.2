@@ -39,6 +39,62 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
     super.dispose();
   }
 
+  void _afficherDialogProfil(BuildContext context) {
+    final photoCtrl = TextEditingController(text: widget.superAdmin.profil.photoProfil);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Profil Super Administrateur'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 44,
+              backgroundImage: widget.superAdmin.profil.photoProfil.isNotEmpty
+                  ? NetworkImage(widget.superAdmin.profil.photoProfil)
+                  : null,
+              child: widget.superAdmin.profil.photoProfil.isEmpty
+                  ? const Icon(Icons.person, size: 44)
+                  : null,
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              controller: photoCtrl,
+              decoration: const InputDecoration(
+                labelText: 'URL / Lien de la photo de profil',
+                hintText: 'https://...',
+                prefixIcon: Icon(Icons.image_outlined),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.save_rounded),
+            label: const Text('Enregistrer'),
+            onPressed: () async {
+              await _service.mettreAJourPhotoProfil(widget.superAdmin.id, photoCtrl.text.trim());
+              if (context.mounted) {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Photo de profil enregistrée avec succès !'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -77,13 +133,18 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
             icon: CircleAvatar(
               radius: 18,
               backgroundColor: theme.colorScheme.primaryContainer,
-              child: Text(
-                nomAdmin.isNotEmpty ? nomAdmin[0].toUpperCase() : 'S',
-                style: TextStyle(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              backgroundImage: widget.superAdmin.profil.photoProfil.isNotEmpty
+                  ? NetworkImage(widget.superAdmin.profil.photoProfil)
+                  : null,
+              child: widget.superAdmin.profil.photoProfil.isEmpty
+                  ? Text(
+                      nomAdmin.isNotEmpty ? nomAdmin[0].toUpperCase() : 'S',
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
             ),
             itemBuilder: (_) => [
               PopupMenuItem(
@@ -92,7 +153,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
                   children: [
                     Icon(Icons.person_outline),
                     SizedBox(width: 8),
-                    Text('Mon profil'),
+                    Text('Mon profil & Photo'),
                   ],
                 ),
               ),
@@ -111,6 +172,8 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
             onSelected: (val) async {
               if (val == 'deconnexion') {
                 await _service.seDeconnecter();
+              } else if (val == 'profil') {
+                _afficherDialogProfil(context);
               }
             },
           ),

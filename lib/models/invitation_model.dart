@@ -23,6 +23,7 @@ class InvitationDirecteur {
   });
 
   bool get estValide => !estUtilise && DateTime.now().isBefore(expiresAt);
+  bool get estExpire => DateTime.now().isAfter(expiresAt);
 
   factory InvitationDirecteur.fromMap(Map<String, dynamic> map, String docId) {
     return InvitationDirecteur(

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import '../models/ecole_rdc_model.dart';
@@ -11,7 +13,7 @@ import '../models/invitation_model.dart';
 const String kSuperAdminEmail = 'readykalonda38@gmail.com';
 
 /// Service Firestore central adapté au système EduTrack RDC
-/// Gère : Super Admin (readykalonda38@gmail.com), Directeurs (par liens d'invitation), Enseignants, Élèves, Parents (avec ID élève)
+/// Gère : Super Admin (readykalonda38@gmail.com), Directeurs, Enseignants, Élèves, Parents
 class FirestoreServiceRDC {
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
@@ -26,7 +28,7 @@ class FirestoreServiceRDC {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // ══════════════════════════════════════════════════
-  // AUTHENTIFICATION SÉCURISÉE
+  // AUTHENTIFICATION SÉCURISÉE GOOGLE + EMAIL
   // ══════════════════════════════════════════════════
 
   Future<UserCredential> seConnecter(String email, String motDePasse, String roleSouhaite) async {
@@ -45,25 +47,51 @@ class FirestoreServiceRDC {
     );
   }
 
-  /// Connexion avec Google Auth (Seule méthode d'authentification recommandée)
+  /// Connexion multiplateforme avec Google Auth (Web + Mobile App)
   /// Reconnaît automatiquement l'adresse du Super Admin principal
   Future<UserCredential> connnecterAvecGoogle({String? roleSouhaite}) async {
+    UserCredential userCredential;
     final googleProvider = GoogleAuthProvider();
     googleProvider.addScope('email');
     googleProvider.addScope('profile');
 
-    UserCredential userCredential;
     try {
-      userCredential = await _auth.signInWithPopup(googleProvider);
+      if (kIsWeb) {
+        try {
+          userCredential = await _auth.signInWithPopup(googleProvider);
+        } catch (e) {
+          // Si les fenêtres surgissantes sont bloquées par le navigateur, utiliser la redirection
+          await _auth.signInWithRedirect(googleProvider);
+          throw Exception('Redirection vers la connexion Google en cours...');
+        }
+      } else {
+        // Application Mobile Native (Android / iOS)
+        try {
+          final GoogleSignIn googleSignIn = GoogleSignIn();
+          final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+          if (googleUser == null) {
+            throw Exception('Connexion Google annulée.');
+          }
+          final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+          final OAuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          userCredential = await _auth.signInWithCredential(credential);
+        } catch (e) {
+          userCredential = await _auth.signInWithProvider(googleProvider);
+        }
+      }
     } catch (e) {
-      userCredential = await _auth.signInWithProvider(googleProvider);
+      rethrow;
     }
 
     final user = userCredential.user;
     if (user != null) {
       final emailClean = user.email?.toLowerCase().trim() ?? '';
+      final photo = user.photoURL ?? '';
 
-      // Auto-reconnaissance du Super Admin
+      // Auto-reconnaissance du Super Admin (readykalonda38@gmail.com)
       if (emailClean == kSuperAdminEmail.toLowerCase()) {
         final displayName = user.displayName ?? 'Super Admin';
         final utilisateurAdmin = UtilisateurEduTrack(
@@ -73,6 +101,7 @@ class FirestoreServiceRDC {
           profil: ProfilUtilisateur(
             prenom: displayName.split(' ').first,
             nom: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : 'Admin',
+            photoProfil: photo,
           ),
           estActif: true,
           createdAt: DateTime.now(),
@@ -90,11 +119,17 @@ class FirestoreServiceRDC {
             profil: ProfilUtilisateur(
               prenom: displayName.split(' ').first,
               nom: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : '',
+              photoProfil: photo,
             ),
             estActif: true,
             createdAt: DateTime.now(),
           );
           await sauvegarderUtilisateur(nouveau);
+        } else if (photo.isNotEmpty) {
+          // Mettre à jour la photo de profil si elle est disponible
+          await _db.collection('utilisateurs').doc(user.uid).set({
+            'profil': {'photoProfil': photo}
+          }, SetOptions(merge: true));
         }
       }
     }
@@ -106,7 +141,7 @@ class FirestoreServiceRDC {
   }
 
   // ══════════════════════════════════════════════════
-  // PROFIL UTILISATEUR
+  // PROFIL UTILISATEUR & UPLOAD PHOTO
   // ══════════════════════════════════════════════════
 
   Future<UtilisateurEduTrack?> getUtilisateur(String userId) async {
@@ -129,11 +164,17 @@ class FirestoreServiceRDC {
         .set(utilisateur.toMap(), SetOptions(merge: true));
   }
 
+  /// Mise à jour de la photo de profil de l'utilisateur (URL ou base64)
+  Future<void> mettreAJourPhotoProfil(String userId, String photoUrl) async {
+    await _db.collection('utilisateurs').doc(userId).set({
+      'profil': {'photoProfil': photoUrl}
+    }, SetOptions(merge: true));
+  }
+
   // ══════════════════════════════════════════════════
   // LIENS D'INVITATION UNIQUE DIRECTEUR / PRÉFET
   // ══════════════════════════════════════════════════
 
-  /// Génère un lien unique d'invitation crypté à usage unique pour un Directeur
   Future<String> genererLienInvitationDirecteur({
     required String ecoleId,
     required String ecoleNom,
@@ -154,29 +195,26 @@ class FirestoreServiceRDC {
       expiresAt: DateTime.now().add(const Duration(days: 7)),
     );
 
-    await _db.collection('invitations').add(invitation.toMap());
-
-    // Génère l'URL complète d'invitation
-    return 'https://copa-ecole.web.app/#/invite?token=$token';
+    await _db.collection('invitations_directeurs').add(invitation.toMap());
+    return token;
   }
 
-  /// Récupère une invitation par son token
   Future<InvitationDirecteur?> getInvitationParToken(String token) async {
     final snap = await _db
-        .collection('invitations')
+        .collection('invitations_directeurs')
         .where('token', isEqualTo: token)
-        .where('estUtilise', isEqualTo: false)
         .limit(1)
         .get();
 
     if (snap.docs.isEmpty) return null;
-    final inv = InvitationDirecteur.fromMap(snap.docs.first.data(), snap.docs.first.id);
-    if (!inv.estValide) return null;
+    final doc = snap.docs.first;
+    final inv = InvitationDirecteur.fromMap(doc.data(), doc.id);
+
+    if (inv.estUtilise || inv.estExpire) return null;
     return inv;
   }
 
-  /// Active le compte d'un Directeur via son token unique et détruit le token
-  Future<UtilisateurEduTrack> consommerInvitationDirecteur({
+  Future<void> consommerInvitationDirecteur({
     required String token,
     required String motDePasse,
     required String prenom,
@@ -184,101 +222,152 @@ class FirestoreServiceRDC {
   }) async {
     final inv = await getInvitationParToken(token);
     if (inv == null) {
-      throw Exception('Lien d\'invitation invalide, expiré ou déjà utilisé.');
+      throw Exception('Lien d\'invitation invalide, expiré ou déjà consommé.');
     }
 
-    // 1. Création compte Firebase Auth
-    final creds = await _auth.createUserWithEmailAndPassword(
-      email: inv.emailDirecteur,
-      password: motDePasse,
-    );
-    final uid = creds.user!.uid;
+    UserCredential cred;
+    if (_auth.currentUser != null) {
+      cred = UserCredentialMock(_auth.currentUser!);
+    } else {
+      cred = await _auth.createUserWithEmailAndPassword(
+        email: inv.emailDirecteur,
+        password: motDePasse,
+      );
+    }
 
-    final utilisateur = UtilisateurEduTrack(
-      id: uid,
+    final user = cred.user!;
+
+    final directeur = UtilisateurEduTrack(
+      id: user.uid,
       email: inv.emailDirecteur,
       role: RoleUtilisateur.directeur,
-      profil: ProfilUtilisateur(prenom: prenom, nom: nom),
       schoolId: inv.ecoleId,
+      profil: ProfilUtilisateur(
+        prenom: prenom,
+        nom: nom,
+        photoProfil: user.photoURL ?? '',
+      ),
+      estActif: true,
       createdAt: DateTime.now(),
     );
 
-    final batch = _db.batch();
+    await sauvegarderUtilisateur(directeur);
 
-    // 2. Sauvegarde du profil directeur
-    batch.set(_db.collection('utilisateurs').doc(uid), utilisateur.toMap());
+    await _db.collection('ecoles_rdc').doc(inv.ecoleId).set({
+      'directeurId': user.uid,
+      'directeurNom': '$prenom $nom',
+    }, SetOptions(merge: true));
 
-    // 3. Mise à jour de l'école
-    batch.update(_db.collection('ecoles').doc(inv.ecoleId), {
-      'directeurId': uid,
-      'directeurNom': '$prenom $nom'.trim(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-
-    // 4. Marquer le token comme définitivement consommé/utilisé (ou suppression)
-    batch.update(_db.collection('invitations').doc(inv.id), {
+    await _db.collection('invitations_directeurs').doc(inv.id).update({
       'estUtilise': true,
       'utiliseLe': FieldValue.serverTimestamp(),
     });
-
-    await batch.commit();
-    return utilisateur;
   }
 
   // ══════════════════════════════════════════════════
-  // INSCRIPTION PUBLIQUE DES PARENTS (AVEC CODE ÉLÈVE)
+  // PARENTS & INSCRIPTION PAR CODE ÉLÈVE
   // ══════════════════════════════════════════════════
 
-  /// Inscription d'un parent réservée sur l'application publique avec liaison ID élève
-  Future<UserCredential> inscrireParent({
+  Future<void> inscrireParent({
     required String email,
     required String motDePasse,
     required String prenom,
     required String nom,
     required String codeEleve,
   }) async {
-    final emailClean = email.trim().toLowerCase();
+    UserCredential cred;
+    if (_auth.currentUser != null) {
+      cred = UserCredentialMock(_auth.currentUser!);
+    } else {
+      cred = await _auth.createUserWithEmailAndPassword(
+        email: email.trim().toLowerCase(),
+        password: motDePasse,
+      );
+    }
 
-    // 1. Inscription Firebase Auth
-    final creds = await _auth.createUserWithEmailAndPassword(
-      email: emailClean,
-      password: motDePasse,
-    );
-    final uid = creds.user!.uid;
+    final user = cred.user!;
+
+    final eleveSnap = await _db
+        .collection('eleves')
+        .where('codeEleve', isEqualTo: codeEleve.trim().toUpperCase())
+        .limit(1)
+        .get();
+
+    String? eleveIdFound;
+    if (eleveSnap.docs.isNotEmpty) {
+      eleveIdFound = eleveSnap.docs.first.id;
+    }
 
     final parent = UtilisateurEduTrack(
-      id: uid,
-      email: emailClean,
+      id: user.uid,
+      email: email.trim().toLowerCase(),
       role: RoleUtilisateur.parent,
-      profil: ProfilUtilisateur(prenom: prenom, nom: nom),
-      eleveIds: [codeEleve.trim()],
+      profil: ProfilUtilisateur(
+        prenom: prenom,
+        nom: nom,
+        photoProfil: user.photoURL ?? '',
+      ),
+      eleveIds: eleveIdFound != null ? [eleveIdFound] : [],
+      estActif: true,
       createdAt: DateTime.now(),
     );
 
-    await _db.collection('utilisateurs').doc(uid).set(parent.toMap());
-    return creds;
+    await sauvegarderUtilisateur(parent);
   }
 
   // ══════════════════════════════════════════════════
-  // SUPER ADMIN — GESTION DES ÉCOLES
+  // ÉCOLES & INFRASTRUCTURE RDC
   // ══════════════════════════════════════════════════
-
-  Future<String> creerEcole(EcoleRDC ecole) async {
-    final data = ecole.toMap();
-    data['createdAt'] = FieldValue.serverTimestamp();
-    data['updatedAt'] = FieldValue.serverTimestamp();
-    final ref = await _db.collection('ecoles').add(data);
-    return ref.id;
-  }
 
   Stream<List<EcoleRDC>> streamToutesLesEcoles() {
-    return _db
-        .collection('ecoles')
-        .orderBy('nom')
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => EcoleRDC.fromMap(doc.data(), doc.id))
-            .toList());
+    return _db.collection('ecoles_rdc').snapshots().map((snap) =>
+        snap.docs.map((doc) => EcoleRDC.fromMap(doc.data(), doc.id)).toList());
+  }
+
+  Future<void> ajouterEcole(EcoleRDC ecole) async {
+    await _db.collection('ecoles_rdc').add(ecole.toMap());
+  }
+
+  /// Alias used by SuperAdminDashboard
+  Future<void> creerEcole(EcoleRDC ecole) => ajouterEcole(ecole);
+
+  Future<void> supprimerEcole(String ecoleId) async {
+    await _db.collection('ecoles_rdc').doc(ecoleId).delete();
+  }
+
+  // ══════════════════════════════════════════════════
+  // STATISTIQUES GLOBALES SUPER ADMIN
+  // ══════════════════════════════════════════════════
+
+  Future<Map<String, int>> getStatistiquesGlobales() async {
+    final results = await Future.wait([
+      _db.collection('ecoles_rdc').count().get(),
+      _db.collection('utilisateurs').where('role', isEqualTo: 'parent').count().get(),
+      _db.collection('utilisateurs').where('role', isEqualTo: 'enseignant').count().get(),
+      _db.collection('eleves').count().get(),
+    ]);
+    return {
+      'ecoles': results[0].count ?? 0,
+      'parents': results[1].count ?? 0,
+      'enseignants': results[2].count ?? 0,
+      'eleves': results[3].count ?? 0,
+    };
+  }
+
+  // ══════════════════════════════════════════════════
+  // GESTION DIRECTEURS
+  // ══════════════════════════════════════════════════
+
+  Future<List<UtilisateurEduTrack>> rechercherUtilisateurs(String emailPartiel) async {
+    final snap = await _db
+        .collection('utilisateurs')
+        .where('email', isGreaterThanOrEqualTo: emailPartiel.toLowerCase())
+        .where('email', isLessThan: '${emailPartiel.toLowerCase()}z')
+        .limit(10)
+        .get();
+    return snap.docs
+        .map((doc) => UtilisateurEduTrack.fromMap(doc.data(), doc.id))
+        .toList();
   }
 
   Future<void> nommerDirecteur({
@@ -286,95 +375,44 @@ class FirestoreServiceRDC {
     required String userId,
     required String nomDirecteur,
   }) async {
-    final batch = _db.batch();
-
-    batch.update(_db.collection('ecoles').doc(ecoleId), {
-      'directeurId': userId,
-      'directeurNom': nomDirecteur,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-
-    batch.update(_db.collection('utilisateurs').doc(userId), {
-      'role': RoleUtilisateur.directeur.name,
-      'schoolId': ecoleId,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-
-    await batch.commit();
-  }
-
-  Future<void> mettreAJourEcole(String ecoleId, Map<String, dynamic> data) async {
-    data['updatedAt'] = FieldValue.serverTimestamp();
-    await _db.collection('ecoles').doc(ecoleId).update(data);
-  }
-
-  Future<Map<String, int>> getStatistiquesGlobales() async {
-    final ecoles = await _db.collection('ecoles').count().get();
-    final utilisateurs = await _db.collection('utilisateurs').count().get();
-    final eleves = await _db
-        .collection('utilisateurs')
-        .where('role', isEqualTo: 'eleve')
-        .count()
-        .get();
-    final enseignants = await _db
-        .collection('utilisateurs')
-        .where('role', isEqualTo: 'enseignant')
-        .count()
-        .get();
-
-    return {
-      'ecoles': ecoles.count ?? 0,
-      'utilisateurs': utilisateurs.count ?? 0,
-      'eleves': eleves.count ?? 0,
-      'enseignants': enseignants.count ?? 0,
-    };
+    await Future.wait([
+      _db.collection('utilisateurs').doc(userId).set({
+        'role': 'directeur',
+        'schoolId': ecoleId,
+      }, SetOptions(merge: true)),
+      _db.collection('ecoles_rdc').doc(ecoleId).set({
+        'directeurId': userId,
+        'directeurNom': nomDirecteur,
+      }, SetOptions(merge: true)),
+    ]);
   }
 
   // ══════════════════════════════════════════════════
-  // GESTION DES CLASSES
+  // CLASSES & NIVEAUX
   // ══════════════════════════════════════════════════
 
-  Future<String> creerClasse(ClasseRDC classe) async {
-    final data = classe.toMap();
-    data['createdAt'] = FieldValue.serverTimestamp();
-    data['updatedAt'] = FieldValue.serverTimestamp();
-    final ref = await _db
-        .collection('ecoles')
-        .doc(classe.schoolId)
-        .collection('classes')
-        .add(data);
-    return ref.id;
+  Stream<List<ClasseRDC>> streamClassesParEcole(String ecoleId) {
+    return _db
+        .collection('classes_rdc')
+        .where('ecoleId', isEqualTo: ecoleId)
+        .snapshots()
+        .map((snap) =>
+            snap.docs.map((doc) => ClasseRDC.fromMap(doc.data(), doc.id)).toList());
   }
 
-  Stream<List<ClasseRDC>> streamClassesEcole(String schoolId,
-      {CycleEnseignement? cycle}) {
-    Query<Map<String, dynamic>> query = _db
-        .collection('ecoles')
-        .doc(schoolId)
-        .collection('classes')
-        .orderBy('niveau');
-
-    if (cycle != null) {
-      query = query.where('cycle', isEqualTo: cycle.name);
-    }
-
-    return query.snapshots().map((snap) =>
-        snap.docs.map((doc) => ClasseRDC.fromMap(doc.data(), doc.id)).toList());
+  Future<void> ajouterClasse(ClasseRDC classe) async {
+    await _db.collection('classes_rdc').add(classe.toMap());
   }
+}
 
-  // ══════════════════════════════════════════════════
-  // RECHERCHE UTILISATEURS
-  // ══════════════════════════════════════════════════
+class UserCredentialMock implements UserCredential {
+  @override
+  final User user;
+  UserCredentialMock(this.user);
 
-  Future<List<UtilisateurEduTrack>> rechercherUtilisateurs(String email) async {
-    final snap = await _db
-        .collection('utilisateurs')
-        .where('email', isGreaterThanOrEqualTo: email.trim().toLowerCase())
-        .where('email', isLessThanOrEqualTo: '${email.trim().toLowerCase()}\uf8ff')
-        .limit(10)
-        .get();
-    return snap.docs
-        .map((doc) => UtilisateurEduTrack.fromMap(doc.data(), doc.id))
-        .toList();
-  }
+  @override
+  AuthCredential? get credential => null;
+
+  @override
+  AdditionalUserInfo? get additionalUserInfo => null;
 }
