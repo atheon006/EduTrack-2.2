@@ -18,10 +18,15 @@ jobs:
       - name: Checkout du dépôt
         uses: actions/checkout@v4
 
-      - name: Installation de Flutter (stable 3.24.5)
+      - name: Installation de Java 17 (Zulu)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Installation de Flutter (stable)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
           channel: 'stable'
           cache: true
 
@@ -29,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyse statique du code
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/app_theme.dart lib/utils/theme_notifier.dart lib/config/api_config.dart lib/services/api_service.dart lib/services/firestore_service.dart
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/ lib/config/ lib/services/firestore_service.dart lib/models/
 
       - name: Build Web (PWA) Release
         run: flutter build web --release
@@ -57,10 +62,9 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Installation de Flutter (stable 3.24.5)
+      - name: Installation de Flutter (stable)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.5'
           channel: 'stable'
           cache: true
 

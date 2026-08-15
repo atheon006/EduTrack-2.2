@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/ecole_rdc_model.dart';
 import '../models/classe_rdc_model.dart';
-import '../models/matiere_model.dart';
 import '../models/utilisateur_model.dart';
 
 /// Service Firestore central adapté au système EduTrack RDC

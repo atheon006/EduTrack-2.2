@@ -28,18 +28,17 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
-    namespace "com.schoolmanagement.school_app"
+    namespace "com.edutrack.school_app"
     compileSdk = 35
-    buildToolsVersion = "30.0.3"  // Specify the installed build tools version
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -47,20 +46,16 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.schoolmanagement.school_app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        applicationId "com.edutrack.school_app"
+        minSdkVersion 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // Add resource configurations to filter resources
-        resConfigs "en", "xxhdpi"
+        // Langues : français (RDC) + anglais
+        resConfigs "fr", "en", "xxhdpi"
     }
 
-    // Add this to avoid resource processing issues
+    // Evite des problèmes de traitement des ressources
     aaptOptions {
         cruncherEnabled = false
     }

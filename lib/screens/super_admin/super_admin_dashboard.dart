@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/ecole_rdc_model.dart';
+import '../../models/classe_rdc_model.dart';
 import '../../models/utilisateur_model.dart';
 import '../../services/firestore_service.dart';
 
