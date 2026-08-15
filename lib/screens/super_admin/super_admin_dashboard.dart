@@ -1092,9 +1092,13 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
       }
     } catch (e) {
       if (mounted) {
+        String msg = 'Erreur lors de la génération du lien. Réessaie.';
+        if (e.toString().contains('permission-denied') || e.toString().contains('PERMISSION_DENIED')) {
+          msg = 'Accès refusé par la base de données. Ton compte doit être connecté.';
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Une erreur s\'est produite. Réessaie.'),
+          SnackBar(
+            content: Text(msg),
             backgroundColor: Colors.red,
           ),
         );

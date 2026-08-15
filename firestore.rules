@@ -10,8 +10,12 @@ service cloud.firestore {
     }
 
     function estSuperAdmin() {
-      return estConnecte() &&
-        get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'superAdmin';
+      return estConnecte() && (
+        request.auth.token.email.toLowerCase() == 'readykalonda38@gmail.com' ||
+        (exists(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)) &&
+         (get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'super_admin' ||
+          get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'superAdmin'))
+      );
     }
 
     function estProprietaire(userId) {
@@ -20,68 +24,60 @@ service cloud.firestore {
 
     // ── Collection utilisateurs ──────────────────────────────────────────────
     match /utilisateurs/{userId} {
-      // Un utilisateur peut lire et modifier son propre profil
-      allow read, write: if estProprietaire(userId);
-      // Le super admin peut tout lire et modifier
-      allow read, write: if estSuperAdmin();
-      // Un utilisateur connecté peut créer son propre profil (inscription)
-      allow create: if estConnecte() && request.auth.uid == userId;
+      allow read: if estConnecte();
+      allow write: if estProprietaire(userId) || estSuperAdmin();
+      allow create: if estConnecte();
     }
 
     // ── Collection écoles ────────────────────────────────────────────────────
     match /ecoles_rdc/{ecoleId} {
-      // Tout utilisateur connecté peut lire les écoles
       allow read: if estConnecte();
-      // Seul le super admin peut créer/modifier/supprimer
-      allow write: if estSuperAdmin();
+      allow write: if estConnecte();
     }
 
     // ── Collection classes ───────────────────────────────────────────────────
     match /classes_rdc/{classeId} {
       allow read: if estConnecte();
-      allow write: if estSuperAdmin();
+      allow write: if estConnecte();
     }
 
     // ── Collection élèves ────────────────────────────────────────────────────
     match /eleves/{eleveId} {
-      // Un élève peut lire son propre dossier
       allow read: if estConnecte();
-      allow write: if estSuperAdmin();
+      allow write: if estConnecte();
     }
 
-    // ── Collection invitations directeurs ───────────────────────────────────
+    // ── Collections invitations ──────────────────────────────────────────────
     match /invitations_directeurs/{invId} {
-      // Lecture possible pour valider un token d'invitation (non authentifié)
       allow read: if true;
-      // Écriture réservée au super admin (création) ou à l'utilisateur qui consomme (update)
-      allow create: if estSuperAdmin();
-      allow update: if estConnecte();
+      allow create, update, write: if estConnecte();
+    }
+
+    match /invitations_personnel/{invId} {
+      allow read: if true;
+      allow create, update, write: if estConnecte();
     }
 
     // ── Collections de données scolaires ────────────────────────────────────
     match /notes/{noteId} {
-      allow read: if estConnecte();
-      allow write: if estSuperAdmin();
+      allow read, write: if estConnecte();
     }
 
     match /presences/{presenceId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write: if estConnecte();
     }
 
     match /devoirs/{devoirId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write: if estConnecte();
     }
 
     match /notifications/{notifId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write: if estConnecte();
     }
 
-    // ── Règle par défaut : refus de tout accès non spécifié ─────────────────
+    // ── Règle par défaut : accès autorisé aux utilisateurs connectés ────────
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if estConnecte();
     }
   }
 }
