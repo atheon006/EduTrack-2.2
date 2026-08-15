@@ -1,45 +1,97 @@
 {
   "project_info": {
-    "project_number": "371745891018",
+    "project_number": "786691292552",
     "project_id": "copa-ecole",
-    "storage_bucket": "copa-ecole.appspot.com"
+    "storage_bucket": "copa-ecole.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:371745891018:android:f7f82bbd0a559a6788ca33",
+        "mobilesdk_app_id": "1:786691292552:android:56df98289b77ea27b04e3d",
         "android_client_info": {
           "package_name": "com.edutrack.school_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "786691292552-euvjerlf5rjovs9llp5uh6189bnn2kvp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.edutrack.school_app",
+            "certificate_hash": "dbdd393c4c4400e48fc8c6126f9c9613680e6658"
+          }
+        },
+        {
+          "client_id": "786691292552-su121d6mbhceiv14vta75h8h3c6574pg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.edutrack.school_app",
+            "certificate_hash": "de3bc37f7b7bd465320f438dc412defe9d2f8fc8"
+          }
+        },
+        {
+          "client_id": "786691292552-neuda6294ea8a6af9dm8tk7k6da5enlo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAp7XmDYOuQsHS0obhS3WW1ZmtPmq8pD-E"
+          "current_key": "AIzaSyBkJqJNltWjuEh-O-9vSqG62OF0BX0fNwE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "786691292552-05r910rk4cehbahr1f72t7o60umlbs8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:371745891018:android:f7f82bbd0a559a6788ca33",
+        "mobilesdk_app_id": "1:786691292552:android:56df98289b77ea27b04e3d",
         "android_client_info": {
-          "package_name": "com.schoolmanagement.school_app"
+          "package_name": "com.example.edutrack_flutter"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "786691292552-euvjerlf5rjovs9llp5uh6189bnn2kvp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.edutrack_flutter",
+            "certificate_hash": "dbdd393c4c4400e48fc8c6126f9c9613680e6658"
+          }
+        },
+        {
+          "client_id": "786691292552-su121d6mbhceiv14vta75h8h3c6574pg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.edutrack_flutter",
+            "certificate_hash": "de3bc37f7b7bd465320f438dc412defe9d2f8fc8"
+          }
+        },
+        {
+          "client_id": "786691292552-neuda6294ea8a6af9dm8tk7k6da5enlo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAp7XmDYOuQsHS0obhS3WW1ZmtPmq8pD-E"
+          "current_key": "AIzaSyBkJqJNltWjuEh-O-9vSqG62OF0BX0fNwE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "786691292552-05r910rk4cehbahr1f72t7o60umlbs8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
