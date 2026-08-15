@@ -7,45 +7,70 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
-    name: Build and Validate EduTrack (Web & Android)
+  # ─────────────────────────────────────────────
+  # Job 1 : Analyse statique + Build Web (PWA)
+  # ─────────────────────────────────────────────
+  build-web:
+    name: "🌐 Analyse & Build Web PWA"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout du dépôt
         uses: actions/checkout@v4
 
-      - name: Set up Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Set up Flutter
+      - name: Installation de Flutter (stable 3.24.5)
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.5'
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
+      - name: Installation des dépendances
         run: flutter pub get
 
-      - name: Run code analysis
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/app_theme.dart lib/utils/theme_notifier.dart lib/config/api_config.dart lib/services/api_service.dart
+      - name: Analyse statique du code
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/app_theme.dart lib/utils/theme_notifier.dart lib/config/api_config.dart lib/services/api_service.dart lib/services/firestore_service.dart
 
       - name: Build Web (PWA) Release
         run: flutter build web --release
 
-      - name: Upload Web Build Artifact
+      - name: Upload artefact Web
         uses: actions/upload-artifact@v4
         with:
           name: edutrack-web-release
           path: build/web
 
-      - name: Build Android AppBundle Release
-        run: flutter build appbundle --release --no-pub
+  # ─────────────────────────────────────────────
+  # Job 2 : Build Android AppBundle
+  # ─────────────────────────────────────────────
+  build-android:
+    name: "🤖 Build Android AppBundle"
+    runs-on: ubuntu-latest
 
-      - name: Upload Android AppBundle Artifact
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installation de Java 17 (Zulu)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Installation de Flutter (stable 3.24.5)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+          cache: true
+
+      - name: Installation des dépendances
+        run: flutter pub get
+
+      - name: Build Android AppBundle Release
+        run: flutter build appbundle --release
+
+      - name: Upload artefact Android AppBundle
         uses: actions/upload-artifact@v4
         with:
           name: edutrack-appbundle-release

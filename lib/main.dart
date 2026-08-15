@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:async';
 import 'utils/storage_util.dart';
 import 'screens/role_selection_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/theme_notifier.dart';
 import 'models/user_model.dart';
+import 'models/utilisateur_model.dart';
 import 'screens/school_admin_dashboard.dart';
 import 'screens/student_dashboard.dart';
 import 'screens/teacher_dashboard.dart';
 import 'screens/parent_dashboard.dart';
+import 'screens/super_admin/super_admin_dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/fcm_service.dart';
 import 'firebase_options.dart';
@@ -112,6 +115,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeNotifier.themeMode,
+          // Localisation en Français (RDC)
+          locale: const Locale('fr', 'FR'),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('fr', 'FR'),
+            Locale('en', 'US'),
+          ],
           home: const SplashScreen(),
         );
       },
@@ -203,13 +217,31 @@ class _SplashScreenState extends State<SplashScreen> {
     Widget destinationScreen;
 
     switch (role) {
+      case 'superAdmin':
+      case 'super_admin':
+        // Super Admin → Tableau de bord global multi-écoles
+        final superAdmin = UtilisateurEduTrack(
+          id: user.id,
+          email: user.email,
+          role: RoleUtilisateur.superAdmin,
+          profil: ProfilUtilisateur(
+            prenom: user.profile.firstName,
+            nom: user.profile.lastName,
+          ),
+          createdAt: DateTime.now(),
+        );
+        destinationScreen = SuperAdminDashboard(superAdmin: superAdmin);
+        break;
       case 'school_admin':
+      case 'directeur':
         destinationScreen = SchoolAdminDashboard(user: user);
         break;
       case 'teacher':
+      case 'enseignant':
         destinationScreen = TeacherDashboard(user: user);
         break;
       case 'student':
+      case 'eleve':
         destinationScreen = StudentDashboard(user: user);
         break;
       case 'parent':
