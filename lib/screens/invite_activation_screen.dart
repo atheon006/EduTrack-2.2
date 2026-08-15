@@ -98,6 +98,9 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryTextColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
+    final inputBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     if (_chargementInitial) {
       return const Scaffold(
@@ -126,7 +129,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Lien d\'invitation invalide',
-                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: primaryTextColor),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -147,9 +150,9 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
     }
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Activation de votre compte Directeur'),
+        title: Text('Activation de votre compte Directeur', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Center(
@@ -158,6 +161,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Card(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               child: Padding(
@@ -170,7 +174,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
+                          color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -181,13 +185,13 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                               _invitation!.ecoleNom,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onPrimaryContainer,
+                                color: isDark ? const Color(0xFFEFF6FF) : const Color(0xFF1E40AF),
                               ),
                             ),
                             Text(
                               _invitation!.emailDirecteur,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                                color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
                               ),
                             ),
                           ],
@@ -197,43 +201,64 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
 
                       Text(
                         'Complétez votre profil de Direction',
-                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: primaryTextColor),
                       ),
                       const SizedBox(height: 16),
 
+                      Text(
+                        'Votre Prénom *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _prenomController,
-                        decoration: const InputDecoration(
-                          labelText: 'Prénom *',
-                          prefixIcon: Icon(Icons.person_outline),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Prénom',
+                          prefixIcon: Icon(Icons.person_outline, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
                       ),
                       const SizedBox(height: 16),
 
+                      Text(
+                        'Votre Nom de famille *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _nomController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nom de famille *',
-                          prefixIcon: Icon(Icons.badge_outlined),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Nom de famille',
+                          prefixIcon: Icon(Icons.badge_outlined, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
                       ),
                       const SizedBox(height: 16),
 
+                      Text(
+                        'Définir un mot de passe *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _passController,
                         obscureText: _cacherMotDePasse,
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
                         decoration: InputDecoration(
-                          labelText: 'Définir un mot de passe *',
-                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintText: 'Au moins 6 caractères',
+                          prefixIcon: Icon(Icons.lock_outline, color: theme.colorScheme.primary),
                           suffixIcon: IconButton(
-                            icon: Icon(_cacherMotDePasse ? Icons.visibility : Icons.visibility_off),
+                            icon: Icon(_cacherMotDePasse ? Icons.visibility : Icons.visibility_off, color: theme.colorScheme.primary),
                             onPressed: () => setState(() => _cacherMotDePasse = !_cacherMotDePasse),
                           ),
-                          border: const OutlineInputBorder(),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) {
                           if (v == null || v.isEmpty) return 'Champ obligatoire';
@@ -243,13 +268,20 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      Text(
+                        'Confirmer le mot de passe *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _confirmPassController,
                         obscureText: _cacherMotDePasse,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirmer le mot de passe *',
-                          prefixIcon: Icon(Icons.lock_reset_outlined),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Répétez votre mot de passe',
+                          prefixIcon: Icon(Icons.lock_reset_outlined, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) {
                           if (v != _passController.text) return 'Les mots de passe ne correspondent pas';
@@ -264,10 +296,10 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
-                            : const Icon(Icons.check_circle_outline),
-                        label: const Text('Activer mon compte & Accéder à l\'école'),
+                            : const Icon(Icons.check_circle_outline, color: Colors.white),
+                        label: const Text('Activer mon compte & Accéder à l\'école', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
                         style: FilledButton.styleFrom(
                           minimumSize: const Size.fromHeight(52),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

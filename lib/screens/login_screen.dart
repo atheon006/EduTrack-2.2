@@ -745,43 +745,64 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginForm() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final roleColor = _getRoleColor(_selectedRole);
+    final textColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
+    final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            'Adresse Email *',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
+          ),
+          const SizedBox(height: 6),
           TextFormField(
             controller: _emailController,
+            style: TextStyle(color: textColor, fontSize: 15),
             decoration: InputDecoration(
-              labelText: 'Adresse Email',
+              hintText: _selectedRole == 'super_admin' ? 'readykalonda38@gmail.com' : 'exemple@domaine.cd',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.email_outlined),
+              prefixIcon: Icon(Icons.email_outlined, color: roleColor),
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: inputBg,
             ),
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (value == null || value.trim().isEmpty) {
                 return 'Veuillez entrer votre email';
+              }
+              if (_selectedRole == 'super_admin' && value.trim().toLowerCase() != 'readykalonda38@gmail.com') {
+                return 'Accès refusé: Seul readykalonda38@gmail.com est autorisé';
               }
               return null;
             },
           ),
           const SizedBox(height: 16),
+          Text(
+            'Mot de passe *',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
+          ),
+          const SizedBox(height: 6),
           TextFormField(
             controller: _passwordController,
+            style: TextStyle(color: textColor, fontSize: 15),
             decoration: InputDecoration(
-              labelText: 'Mot de passe',
+              hintText: 'Votre mot de passe',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.lock_outline),
+              prefixIcon: Icon(Icons.lock_outline, color: roleColor),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  color: roleColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -790,7 +811,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: inputBg,
             ),
             obscureText: _obscurePassword,
             validator: (value) {
@@ -804,7 +825,10 @@ class _LoginScreenState extends State<LoginScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: _showForgotPasswordDialog,
-              child: const Text('Mot de passe oublié ?'),
+              child: Text(
+                'Mot de passe oublié ?',
+                style: TextStyle(color: roleColor, fontWeight: FontWeight.w600),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -825,12 +849,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
-                      strokeWidth: 2.0,
+                      strokeWidth: 2.5,
                     ),
                   )
                 : const Text(
                     'Se connecter',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
           ),
         ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 
 /// Écran d'inscription publique réservé uniquement aux Parents / Tuteurs
-/// Nécessite le Code Élève / ID de l'enfant pour finaliser la création du compte
+/// Design ultra-épuré, lisibilité maximale, validation du Code Élève / ID
 class ParentSignupScreen extends StatefulWidget {
   const ParentSignupScreen({super.key});
 
@@ -51,7 +51,7 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Inscription réussie ! Votre compte Parent est créé.'),
+            content: Text('Inscription réussie ! Votre compte Parent est maintenant créé.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -71,21 +71,38 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final primaryTextColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
+    final inputBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Inscription Parent / Tuteur'),
+        title: Text(
+          'Inscription Parent / Tuteur',
+          style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: primaryTextColor),
+          onPressed: () => Navigator.pop(context),
+        ),
         centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 480),
             child: Card(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Form(
@@ -93,15 +110,26 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Header Card
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.purple.shade50,
+                          color: isDark ? const Color(0xFF3B0764) : const Color(0xFFF3E8FF),
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF6B21A8) : const Color(0xFFE9D5FF),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.family_restroom_rounded, size: 36, color: Colors.purple.shade700),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.purple.shade700,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.family_restroom_rounded, size: 28, color: Colors.white),
+                            ),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(
@@ -111,12 +139,17 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
                                     'Espace Parent EduTrack',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.purple.shade900,
+                                      fontSize: 16,
+                                      color: isDark ? const Color(0xFFF3E8FF) : const Color(0xFF581C87),
                                     ),
                                   ),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    'Inscrivez-vous pour suivre la scolarité de votre enfant',
-                                    style: TextStyle(fontSize: 12, color: Colors.purple.shade800),
+                                    'Renseignez l\'ID de votre enfant pour lier votre compte',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? const Color(0xFFE9D5FF) : const Color(0xFF7E22CE),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -126,88 +159,135 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Code élève
+                      // Code Élève / ID
+                      Text(
+                        'Code Élève / ID de votre enfant *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _codeEleveController,
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
                         decoration: InputDecoration(
-                          labelText: 'Code Élève / ID de votre enfant *',
                           hintText: 'ex: ELEVE-2024-001',
-                          prefixIcon: const Icon(Icons.qr_code_scanner_rounded),
-                          border: const OutlineInputBorder(),
-                          suffixIcon: Tooltip(
-                            message: 'L\'ID fourni par l\'école pour identifier votre enfant',
-                            child: Icon(Icons.info_outline, color: theme.colorScheme.primary),
-                          ),
+                          prefixIcon: Icon(Icons.qr_code_scanner_rounded, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
-                        validator: (v) => v == null || v.isEmpty ? 'Veuillez entrer le code de votre enfant' : null,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Veuillez entrer le code de votre enfant'
+                            : null,
                       ),
                       const SizedBox(height: 16),
 
+                      // Prénom
+                      Text(
+                        'Votre Prénom *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _prenomController,
-                        decoration: const InputDecoration(
-                          labelText: 'Votre Prénom *',
-                          prefixIcon: Icon(Icons.person_outline),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Votre prénom',
+                          prefixIcon: Icon(Icons.person_outline_rounded, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
-                        validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
+                        validator: (v) => v == null || v.trim().isEmpty ? 'Champ obligatoire' : null,
                       ),
                       const SizedBox(height: 16),
 
+                      // Nom
+                      Text(
+                        'Votre Nom de Famille *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _nomController,
-                        decoration: const InputDecoration(
-                          labelText: 'Votre Nom *',
-                          prefixIcon: Icon(Icons.badge_outlined),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Votre nom de famille',
+                          prefixIcon: Icon(Icons.badge_outlined, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
-                        validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
+                        validator: (v) => v == null || v.trim().isEmpty ? 'Champ obligatoire' : null,
                       ),
                       const SizedBox(height: 16),
 
+                      // Email
+                      Text(
+                        'Adresse Email *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Adresse Email *',
-                          prefixIcon: Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'exemple@domaine.cd',
+                          prefixIcon: Icon(Icons.email_outlined, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Champ obligatoire';
-                          if (!v.contains('@') || !v.contains('.')) return 'Email invalide';
+                          if (v == null || v.trim().isEmpty) return 'Champ obligatoire';
+                          if (!v.contains('@') || !v.contains('.')) return 'Adresse email invalide';
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
 
+                      // Mot de passe
+                      Text(
+                        'Mot de passe *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _passController,
                         obscureText: _cacherMotDePasse,
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
                         decoration: InputDecoration(
-                          labelText: 'Mot de passe *',
-                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintText: 'Au moins 6 caractères',
+                          prefixIcon: Icon(Icons.lock_outline_rounded, color: theme.colorScheme.primary),
                           suffixIcon: IconButton(
-                            icon: Icon(_cacherMotDePasse ? Icons.visibility : Icons.visibility_off),
+                            icon: Icon(
+                              _cacherMotDePasse ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                              color: theme.colorScheme.primary,
+                            ),
                             onPressed: () => setState(() => _cacherMotDePasse = !_cacherMotDePasse),
                           ),
-                          border: const OutlineInputBorder(),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) {
                           if (v == null || v.isEmpty) return 'Champ obligatoire';
-                          if (v.length < 6) return 'Au moins 6 caractères';
+                          if (v.length < 6) return 'Au moins 6 caractères requis';
                           return null;
                         },
                       ),
                       const SizedBox(height: 16),
 
+                      // Confirmation mot de passe
+                      Text(
+                        'Confirmer le mot de passe *',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                      ),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _confirmPassController,
                         obscureText: _cacherMotDePasse,
-                        decoration: const InputDecoration(
-                          labelText: 'Confirmer le mot de passe *',
-                          prefixIcon: Icon(Icons.lock_reset_outlined),
-                          border: OutlineInputBorder(),
+                        style: TextStyle(color: primaryTextColor, fontSize: 15),
+                        decoration: InputDecoration(
+                          hintText: 'Répétez votre mot de passe',
+                          prefixIcon: Icon(Icons.lock_reset_rounded, color: theme.colorScheme.primary),
+                          fillColor: inputBgColor,
+                          filled: true,
                         ),
                         validator: (v) {
                           if (v != _passController.text) return 'Les mots de passe ne correspondent pas';
@@ -216,20 +296,24 @@ class _ParentSignupScreenState extends State<ParentSignupScreen> {
                       ),
                       const SizedBox(height: 28),
 
-                      FilledButton.icon(
+                      // Submit Button
+                      ElevatedButton.icon(
                         onPressed: _chargement ? null : _inscrireParent,
                         icon: _chargement
                             ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                               )
-                            : const Icon(Icons.person_add_rounded),
-                        label: const Text('Créer mon compte Parent'),
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size.fromHeight(52),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            : const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
+                        label: Text(
+                          _chargement ? 'Inscription en cours...' : 'Créer mon compte Parent',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(54),
                           backgroundColor: Colors.purple.shade700,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
                     ],
