@@ -579,7 +579,7 @@ class _ParentDashboardState extends State<ParentDashboard>
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: LinearGradient(
-                      colors: [Colors.white, _accentColor.withOpacity(0.1)],
+                      colors: [Colors.white, _accentColor.withValues(alpha: 0.1)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -711,20 +711,20 @@ class _ParentDashboardState extends State<ParentDashboard>
   }) {
     return Card(
       elevation: 3,
-      shadowColor: color.withOpacity(0.4),
+      shadowColor: color.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: color.withOpacity(0.1), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.1), width: 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
-        splashColor: color.withOpacity(0.1),
-        highlightColor: color.withOpacity(0.05),
+        splashColor: color.withValues(alpha: 0.1),
+        highlightColor: color.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, color.withOpacity(0.05)],
+              colors: [Colors.white, color.withValues(alpha: 0.05)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -737,7 +737,7 @@ class _ParentDashboardState extends State<ParentDashboard>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 26),
@@ -793,14 +793,14 @@ class _ParentDashboardState extends State<ParentDashboard>
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _accentColor.withOpacity(0.1),
+                        color: _accentColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(Icons.dashboard, color: _accentColor),
                     ),
                     title: const Text('Dashboard'),
                     selected: true,
-                    selectedTileColor: _accentColor.withOpacity(0.1),
+                    selectedTileColor: _accentColor.withValues(alpha: 0.1),
                     onTap: () {
                       Navigator.pop(context);
                     },
@@ -858,7 +858,7 @@ class _ParentDashboardState extends State<ParentDashboard>
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.2),
+                    color: Colors.red.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.logout, color: Colors.red),
@@ -1046,7 +1046,7 @@ class _ParentDashboardState extends State<ParentDashboard>
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: color, size: 22),
@@ -1075,7 +1075,7 @@ class _ParentDashboardState extends State<ParentDashboard>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      hoverColor: color.withOpacity(0.05),
+      hoverColor: color.withValues(alpha: 0.05),
       selectedColor: color,
     );
   }

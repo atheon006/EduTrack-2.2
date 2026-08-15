@@ -399,14 +399,14 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: _accentColor.withOpacity(0.1),
+                    color: _accentColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.dashboard, color: _accentColor),
                 ),
                 title: const Text('Dashboard'),
                 selected: true,
-                selectedTileColor: _accentColor.withOpacity(0.1),
+                selectedTileColor: _accentColor.withValues(alpha: 0.1),
                 onTap: () {
                   Navigator.pop(context);
                 },
@@ -415,7 +415,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.person, color: Colors.grey),
@@ -447,7 +447,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.class_, color: Colors.blue),
@@ -465,7 +465,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.assignment, color: Colors.green),
@@ -483,7 +483,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.check_circle, color: Colors.red),
@@ -501,7 +501,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.trending_up, color: Colors.orange),
@@ -531,7 +531,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: Colors.purple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.announcement, color: Colors.purple),
@@ -563,7 +563,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.2),
+                    color: Colors.red.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.logout, color: Colors.red),
@@ -980,7 +980,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
             height: 3,
             margin: const EdgeInsets.symmetric(horizontal: 1),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(1.5),
             ),
             child: AnimatedBuilder(
@@ -1310,9 +1310,9 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
           padding: const EdgeInsets.all(20),
           margin: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -1537,7 +1537,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.2),
+                color: statusColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(Icons.class_, color: statusColor),
@@ -1584,9 +1584,9 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: statusColor.withOpacity(0.3)),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     statusText,
@@ -1770,20 +1770,20 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
   }) {
     return Card(
       elevation: 3,
-      shadowColor: color.withOpacity(0.4),
+      shadowColor: color.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: color.withOpacity(0.1), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.1), width: 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
-        splashColor: color.withOpacity(0.1),
-        highlightColor: color.withOpacity(0.05),
+        splashColor: color.withValues(alpha: 0.1),
+        highlightColor: color.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, color.withOpacity(0.05)],
+              colors: [Colors.white, color.withValues(alpha: 0.05)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -1796,7 +1796,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 26),

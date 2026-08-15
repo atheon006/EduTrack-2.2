@@ -347,7 +347,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           spreadRadius: 1,
                           blurRadius: 3,
                         ),
@@ -385,7 +385,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -488,9 +488,9 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: _accentColor.withOpacity(0.1),
+                      color: _accentColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _accentColor.withOpacity(0.3)),
+                      border: Border.all(color: _accentColor.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       subject.toString(),

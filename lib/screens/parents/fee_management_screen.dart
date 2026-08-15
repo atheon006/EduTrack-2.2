@@ -203,7 +203,7 @@ class _ParentFeeManagementScreenState extends State<ParentFeeManagementScreen> {
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: isSelected ? _primaryColor.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                color: isSelected ? _primaryColor.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.1),
                 border: Border.all(
                   color: isSelected ? _primaryColor : Colors.transparent,
                   width: 2,
@@ -425,7 +425,7 @@ class _ParentFeeManagementScreenState extends State<ParentFeeManagementScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: (record['color'] as Color).withOpacity(0.1),
+                      color: (record['color'] as Color).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -480,7 +480,7 @@ class _ParentFeeManagementScreenState extends State<ParentFeeManagementScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: (record['color'] as Color).withOpacity(0.1),
+                          color: (record['color'] as Color).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -603,7 +603,7 @@ class _ParentFeeManagementScreenState extends State<ParentFeeManagementScreen> {
             for (final method in paymentMethods)
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: (method['color'] as Color).withOpacity(0.2),
+                  backgroundColor: (method['color'] as Color).withValues(alpha: 0.2),
                   child: Icon(method['icon'] as IconData, color: method['color'] as Color),
                 ),
                 title: Text(method['name'] as String),

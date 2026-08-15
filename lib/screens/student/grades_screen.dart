@@ -250,7 +250,7 @@ class _GradesScreenState extends State<GradesScreen> with SingleTickerProviderSt
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -318,7 +318,7 @@ class _GradesScreenState extends State<GradesScreen> with SingleTickerProviderSt
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: (grade['color'] as Color).withOpacity(0.2),
+            color: (grade['color'] as Color).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(Icons.book, color: grade['color'] as Color),
@@ -368,7 +368,7 @@ class _GradesScreenState extends State<GradesScreen> with SingleTickerProviderSt
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -412,7 +412,7 @@ class _GradesScreenState extends State<GradesScreen> with SingleTickerProviderSt
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color, width: 1),
       ),

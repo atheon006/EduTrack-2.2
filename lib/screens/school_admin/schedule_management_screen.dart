@@ -350,9 +350,9 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -708,7 +708,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+              colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -880,7 +880,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _primaryColor.withOpacity(0.1),
+            color: _primaryColor.withValues(alpha: 0.1),
             border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
           ),
           child: Column(
@@ -906,7 +906,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                           'Grade ${classInfo['grade'] ?? 'N/A'}${classInfo['section'] ?? ''} - ${classInfo['year'] ?? 'N/A'}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: _primaryColor.withOpacity(0.7),
+                            color: _primaryColor.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -928,7 +928,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -978,8 +978,8 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  _accentColor.withOpacity(0.2),
-                                  _accentColor.withOpacity(0.1),
+                                  _accentColor.withValues(alpha: 0.2),
+                                  _accentColor.withValues(alpha: 0.1),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -1065,7 +1065,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                                         gradient: LinearGradient(
                                           colors: [
                                             _primaryColor,
-                                            _primaryColor.withOpacity(0.8),
+                                            _primaryColor.withValues(alpha: 0.8),
                                           ],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
@@ -1073,7 +1073,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                                         borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: _primaryColor.withOpacity(0.3),
+                                            color: _primaryColor.withValues(alpha: 0.3),
                                             blurRadius: 4,
                                             offset: const Offset(0, 2),
                                           ),
@@ -1244,7 +1244,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _primaryColor.withOpacity(0.1),
+                    color: _primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -1267,9 +1267,9 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -1548,7 +1548,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                   gradient: LinearGradient(
                     colors: dayPeriods.isEmpty 
                         ? [Colors.grey.shade100, Colors.grey.shade50]
-                        : [_accentColor.withOpacity(0.2), _accentColor.withOpacity(0.1)],
+                        : [_accentColor.withValues(alpha: 0.2), _accentColor.withValues(alpha: 0.1)],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -1607,10 +1607,10 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                     // Add Period button for each day
                     Container(
                       decoration: BoxDecoration(
-                        color: _primaryColor.withOpacity(0.1),
+                        color: _primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: _primaryColor.withOpacity(0.3),
+                          color: _primaryColor.withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -1697,7 +1697,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                               gradient: LinearGradient(
                                 colors: [
                                   _primaryColor,
-                                  _primaryColor.withOpacity(0.8),
+                                  _primaryColor.withValues(alpha: 0.8),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -1705,7 +1705,7 @@ class _ScheduleManagementScreenState extends State<ScheduleManagementScreen>
                               borderRadius: BorderRadius.circular(18),
                               boxShadow: [
                                 BoxShadow(
-                                  color: _primaryColor.withOpacity(0.3),
+                                  color: _primaryColor.withValues(alpha: 0.3),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),

@@ -388,7 +388,7 @@ class _SchoolAdminDashboardState extends State<SchoolAdminDashboard> with Ticker
                   leading: Icon(Icons.dashboard, color: _accentColor),
                   title: const Text('Dashboard'),
                   selected: _currentIndex == 0,
-                  selectedTileColor: _accentColor.withOpacity(0.1),
+                  selectedTileColor: _accentColor.withValues(alpha: 0.1),
                   onTap: () {
                     Navigator.pop(context);
                     setState(() {
@@ -521,7 +521,7 @@ class _SchoolAdminDashboardState extends State<SchoolAdminDashboard> with Ticker
           ),
           boxShadow: [
             BoxShadow(
-              color: _primaryColor.withOpacity(0.3),
+              color: _primaryColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -547,7 +547,7 @@ class _SchoolAdminDashboardState extends State<SchoolAdminDashboard> with Ticker
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -641,7 +641,7 @@ class _SchoolAdminDashboardState extends State<SchoolAdminDashboard> with Ticker
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -785,22 +785,22 @@ Widget _buildModernAdminTool({
       onTapCancel: () {},
       child: Card(
         elevation: 6,
-        shadowColor: color.withOpacity(0.3),
+        shadowColor: color.withValues(alpha: 0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: color.withOpacity(0.15), width: 1.5),
+          side: BorderSide(color: color.withValues(alpha: 0.15), width: 1.5),
         ),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, color.withOpacity(0.08)],
+              colors: [Colors.white, color.withValues(alpha: 0.08)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 blurRadius: 10,
                 spreadRadius: 2,
                 offset: const Offset(0, 2),
@@ -815,11 +815,11 @@ Widget _buildModernAdminTool({
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity(0.15),
+                      color: color.withValues(alpha: 0.15),
                       blurRadius: 8,
                       spreadRadius: 2,
                     ),
@@ -854,7 +854,7 @@ Widget _buildModernAdminTool({
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
+                      color: color.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1045,7 +1045,7 @@ Widget _buildModernAdminTool({
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-            color: color.withOpacity(0.2), shape: BoxShape.circle),
+            color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
         child: Icon(icon, color: color),
       ),
       title: Text(title),
@@ -1536,7 +1536,7 @@ Widget _buildModernAdminTool({
             height: 3,
             margin: const EdgeInsets.symmetric(horizontal: 1),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(1.5),
             ),
             child: AnimatedBuilder(
@@ -1864,9 +1864,9 @@ Widget _buildModernAdminTool({
           padding: const EdgeInsets.all(20),
           margin: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [

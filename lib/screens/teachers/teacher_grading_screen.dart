@@ -562,7 +562,7 @@ class _TeacherGradingScreenState extends State<TeacherGradingScreen> with Single
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: classColor.withOpacity(0.1),
+            color: classColor.withValues(alpha: 0.1),
             border: Border(
               bottom: BorderSide(color: Colors.grey.shade300, width: 1),
             ),
@@ -658,7 +658,7 @@ class _TeacherGradingScreenState extends State<TeacherGradingScreen> with Single
                 BoxShadow(
                   offset: const Offset(0, -2),
                   blurRadius: 8,
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                 ),
               ],
             ),
@@ -786,10 +786,10 @@ class _TeacherGradingScreenState extends State<TeacherGradingScreen> with Single
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: _getGradeColor(currentGrade['percentage']).withOpacity(0.1),
+                        color: _getGradeColor(currentGrade['percentage']).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: _getGradeColor(currentGrade['percentage']).withOpacity(0.5),
+                          color: _getGradeColor(currentGrade['percentage']).withValues(alpha: 0.5),
                         ),
                       ),
                       child: Row(

@@ -183,7 +183,7 @@ class _NotificationManagementScreenState extends State<NotificationManagementScr
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: color.withOpacity(0.5), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.5), width: 1),
       ),
       child: InkWell(
         onTap: onTap,
@@ -652,7 +652,7 @@ class _NotificationManagementScreenState extends State<NotificationManagementScr
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+              colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -767,11 +767,11 @@ class _NotificationManagementScreenState extends State<NotificationManagementScr
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shadowColor: notification.getTypeColor().withOpacity(0.3),
+      shadowColor: notification.getTypeColor().withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: notification.getTypeColor().withOpacity(0.5),
+          color: notification.getTypeColor().withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -1113,7 +1113,7 @@ class _MessageCompositionScreenState extends State<MessageCompositionScreen> {
               margin: const EdgeInsets.only(bottom: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: widget.iconColor.withOpacity(0.5)),
+                side: BorderSide(color: widget.iconColor.withValues(alpha: 0.5)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),

@@ -288,7 +288,7 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: isSelected ? _primaryColor.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                color: isSelected ? _primaryColor.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.1),
                 border: Border.all(
                   color: isSelected ? _primaryColor : Colors.transparent,
                   width: 2,
@@ -337,14 +337,14 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
                             Icon(
                               Icons.calendar_today,
                               size: 12,
-                              color: isSelected ? _primaryColor.withOpacity(0.8) : Colors.grey[600],
+                              color: isSelected ? _primaryColor.withValues(alpha: 0.8) : Colors.grey[600],
                             ),
                             const SizedBox(width: 4),
                             Text(
                               student['attendance'],
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isSelected ? _primaryColor.withOpacity(0.8) : Colors.grey[600],
+                                color: isSelected ? _primaryColor.withValues(alpha: 0.8) : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -388,7 +388,7 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [_primaryColor, _primaryColor.withOpacity(0.7)],
+                  colors: [_primaryColor, _primaryColor.withValues(alpha: 0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -642,9 +642,9 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
       width: 80,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -762,7 +762,7 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
                   padding: const EdgeInsets.all(2.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Column(
@@ -842,7 +842,7 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: color.withOpacity(0.2),
+                  backgroundColor: color.withValues(alpha: 0.2),
                   child: Icon(
                     status == 'Present' ? Icons.check_circle :
                     status == 'Absent' ? Icons.cancel :
@@ -854,7 +854,7 @@ class _ParentAttendanceScreenState extends State<ParentAttendanceScreen> {
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

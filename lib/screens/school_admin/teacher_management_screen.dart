@@ -237,7 +237,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+              colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -305,7 +305,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+                                    colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
@@ -328,7 +328,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
+                                        color: Colors.white.withValues(alpha: 0.3),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -423,7 +423,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                       }                          
                                       return Card(
                                         elevation: 3,
-                                        shadowColor: gradientColors[0].withOpacity(0.3),
+                                        shadowColor: gradientColors[0].withValues(alpha: 0.3),
                                         margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(18),
@@ -457,7 +457,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                                         shape: BoxShape.circle,
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: gradientColors[0].withOpacity(0.3),
+                                                            color: gradientColors[0].withValues(alpha: 0.3),
                                                             blurRadius: 8,
                                                             offset: const Offset(0, 2),
                                                           ),
@@ -517,7 +517,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                                         borderRadius: BorderRadius.circular(16),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color: gradientColors[0].withOpacity(0.3),
+                                                            color: gradientColors[0].withValues(alpha: 0.3),
                                                             blurRadius: 4,
                                                             offset: const Offset(0, 2),
                                                           ),
@@ -557,20 +557,20 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                                                 decoration: BoxDecoration(
                                                                   gradient: LinearGradient(
                                                                     colors: [
-                                                                      gradientColors[0].withOpacity(0.2),
-                                                                      gradientColors[1].withOpacity(0.2),
+                                                                      gradientColors[0].withValues(alpha: 0.2),
+                                                                      gradientColors[1].withValues(alpha: 0.2),
                                                                     ],
                                                                     begin: Alignment.topLeft,
                                                                     end: Alignment.bottomRight,
                                                                   ),
                                                                   borderRadius: BorderRadius.circular(16),
-                                                                  border: Border.all(color: gradientColors[0].withOpacity(0.3)),
+                                                                  border: Border.all(color: gradientColors[0].withValues(alpha: 0.3)),
                                                                 ),
                                                                 child: Text(
                                                                   subject,
                                                                   style: TextStyle(
                                                                     fontSize: 12, 
-                                                                    color: gradientColors[0].withOpacity(0.8),
+                                                                    color: gradientColors[0].withValues(alpha: 0.8),
                                                                     fontWeight: FontWeight.w500,
                                                                   ),
                                                                 ),
@@ -599,15 +599,15 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                                           .map((className) => Container(
                                                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                                                 decoration: BoxDecoration(
-                                                                  color: gradientColors[0].withOpacity(0.1),
+                                                                  color: gradientColors[0].withValues(alpha: 0.1),
                                                                   borderRadius: BorderRadius.circular(16),
-                                                                  border: Border.all(color: gradientColors[0].withOpacity(0.2)),
+                                                                  border: Border.all(color: gradientColors[0].withValues(alpha: 0.2)),
                                                                 ),
                                                                 child: Text(
                                                                   className,
                                                                   style: TextStyle(
                                                                     fontSize: 12, 
-                                                                    color: gradientColors[0].withOpacity(0.8),
+                                                                    color: gradientColors[0].withValues(alpha: 0.8),
                                                                     fontWeight: FontWeight.w500,
                                                                   ),
                                                                 ),
@@ -627,7 +627,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                                   ),
                                                   border: Border(
                                                     top: BorderSide(
-                                                      color: gradientColors[0].withOpacity(0.2),
+                                                      color: gradientColors[0].withValues(alpha: 0.2),
                                                       width: 1,
                                                     ),
                                                   ),
@@ -706,14 +706,14 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_accentColor, _accentColor.withOpacity(0.8)],
+            colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: _accentColor.withOpacity(0.4),
+              color: _accentColor.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -878,7 +878,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               spreadRadius: 1,
               offset: const Offset(0, -2),
@@ -895,14 +895,14 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [_accentColor, _accentColor.withOpacity(0.8)],
+                      colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _accentColor.withOpacity(0.3),
+                        color: _accentColor.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       )
@@ -982,8 +982,8 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
       selected: selected,
       onSelected: onSelected,
       backgroundColor: Colors.white,
-      selectedColor: color.withOpacity(0.15),
-      checkmarkColor: color.withOpacity(0.8),
+      selectedColor: color.withValues(alpha: 0.15),
+      checkmarkColor: color.withValues(alpha: 0.8),
       labelStyle: TextStyle(
         color: selected ? color : Colors.black87,
         fontWeight: selected ? FontWeight.bold : FontWeight.normal,
@@ -1017,14 +1017,14 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                 padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_accentColor, _accentColor.withOpacity(0.7)],
+                    colors: [_accentColor, _accentColor.withValues(alpha: 0.7)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(
-                      color: _accentColor.withOpacity(0.3),
+                      color: _accentColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -1062,7 +1062,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                               Text(
                                 teacher['qualification'] as String,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 16,
                                 ),
                               ),
@@ -1070,7 +1070,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Text(
@@ -1121,7 +1121,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                             spacing: 8,
                             children: ((teacher['roles'] ?? <String>[]) as List<dynamic>).map((role) => Chip(
                                   label: Text(role.toString()),
-                                  backgroundColor: _tertiaryColor.withOpacity(0.2),
+                                  backgroundColor: _tertiaryColor.withValues(alpha: 0.2),
                                 )).toList(),
                           ),
                         ],
@@ -1139,7 +1139,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                             spacing: 8,
                             children: (teacher['subjects'] as List<String>).map((subject) => Chip(
                                   label: Text(subject),
-                                  backgroundColor: _primaryColor.withOpacity(0.2),
+                                  backgroundColor: _primaryColor.withValues(alpha: 0.2),
                                 )).toList(),
                           ),
                         ],
@@ -1157,7 +1157,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                             spacing: 8,
                             children: (teacher['classes'] as List<String>).map((className) => Chip(
                                   label: Text(className),
-                                  backgroundColor: _accentColor.withOpacity(0.2),
+                                  backgroundColor: _accentColor.withValues(alpha: 0.2),
                                 )).toList(),
                           ),
                         ],
@@ -1210,9 +1210,9 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1277,7 +1277,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue.shade50, Colors.blue.shade100.withOpacity(0.3)],
+          colors: [Colors.blue.shade50, Colors.blue.shade100.withValues(alpha: 0.3)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -1285,7 +1285,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
         border: Border.all(color: Colors.blue.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.shade100.withOpacity(0.5),
+            color: Colors.blue.shade100.withValues(alpha: 0.5),
             blurRadius: 8,
             spreadRadius: 1,
             offset: const Offset(0, 2),
@@ -1528,7 +1528,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                                   });
                                 },
                                 checkmarkColor: _accentColor,
-                                selectedColor: _accentColor.withOpacity(0.15),
+                                selectedColor: _accentColor.withValues(alpha: 0.15),
                                 backgroundColor: Colors.grey.shade50,
                                 side: BorderSide(color: Colors.grey.shade300),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1571,7 +1571,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                         //           });
                         //         },
                         //         checkmarkColor: _accentColor,
-                        //         selectedColor: _accentColor.withOpacity(0.15),
+                        //         selectedColor: _accentColor.withValues(alpha: 0.15),
                         //         backgroundColor: Colors.grey.shade50,
                         //         side: BorderSide(color: Colors.grey.shade300),
                         //         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

@@ -183,7 +183,7 @@ class _ParentNotificationScreenState extends State<ParentNotificationScreen> wit
                 ),
                 ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: _accentColor.withOpacity(0.2),
+                    backgroundColor: _accentColor.withValues(alpha: 0.2),
                     child: Icon(Icons.person, color: _accentColor),
                   ),
                   title: const Text('Message to Teacher'),
@@ -243,7 +243,7 @@ class _ParentNotificationScreenState extends State<ParentNotificationScreen> wit
             title: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _accentColor.withOpacity(0.2),
+                  backgroundColor: _accentColor.withValues(alpha: 0.2),
                   child: Icon(Icons.person, color: _accentColor),
                 ),
                 const SizedBox(width: 12),
@@ -504,7 +504,7 @@ class _ParentNotificationScreenState extends State<ParentNotificationScreen> wit
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: CircleAvatar(
-          backgroundColor: notification.getTypeColor().withOpacity(0.2),
+          backgroundColor: notification.getTypeColor().withValues(alpha: 0.2),
           child: Icon(
             notification.getTypeIcon(),
             color: notification.getTypeColor(),
@@ -602,7 +602,7 @@ class _ParentNotificationScreenState extends State<ParentNotificationScreen> wit
           title: Row(
             children: [
               CircleAvatar(
-                backgroundColor: notification.getTypeColor().withOpacity(0.2),
+                backgroundColor: notification.getTypeColor().withValues(alpha: 0.2),
                 child: Icon(
                   notification.getTypeIcon(),
                   color: notification.getTypeColor(),

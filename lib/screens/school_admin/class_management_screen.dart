@@ -197,14 +197,14 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [_accentColor, _accentColor.withOpacity(0.8)],
+                              colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: _accentColor.withOpacity(0.3),
+                                color: _accentColor.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               )
@@ -278,7 +278,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.blue.shade50,
-                                  Colors.blue.shade100.withOpacity(0.3),
+                                  Colors.blue.shade100.withValues(alpha: 0.3),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -340,7 +340,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   Colors.green.shade50,
-                                  Colors.green.shade100.withOpacity(0.3),
+                                  Colors.green.shade100.withValues(alpha: 0.3),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -451,8 +451,8 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
       selected: selected,
       onSelected: onSelected,
       backgroundColor: Colors.white,
-      selectedColor: color.withOpacity(0.15),
-      checkmarkColor: color.withOpacity(0.8), // Using darker version of the same color
+      selectedColor: color.withValues(alpha: 0.15),
+      checkmarkColor: color.withValues(alpha: 0.8), // Using darker version of the same color
       labelStyle: TextStyle(
         color:  Colors.black87,
         fontWeight: selected ? FontWeight.bold : FontWeight.normal,
@@ -480,7 +480,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+              colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -597,14 +597,14 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_accentColor, _accentColor.withOpacity(0.8)],
+            colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: _accentColor.withOpacity(0.4),
+              color: _accentColor.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -776,7 +776,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                 tag: 'class-${classData['_id'] ?? classData['id'] ?? index}',
                 child: Card(
                   elevation: 3,
-                  shadowColor: gradientColors[0].withOpacity(0.3),
+                  shadowColor: gradientColors[0].withValues(alpha: 0.3),
                   margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
@@ -784,8 +784,8 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(18),
                     onTap: () => _showClassDetails(classData),
-                    splashColor: gradientColors[0].withOpacity(0.1),
-                    highlightColor: gradientColors[0].withOpacity(0.05),
+                    splashColor: gradientColors[0].withValues(alpha: 0.1),
+                    highlightColor: gradientColors[0].withValues(alpha: 0.05),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -812,7 +812,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: gradientColors[0].withOpacity(0.3),
+                                      color: gradientColors[0].withValues(alpha: 0.3),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -944,20 +944,20 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                                               decoration: BoxDecoration(
                                                 gradient: LinearGradient(
                                                   colors: [
-                                                    gradientColors[0].withOpacity(0.2),
-                                                    gradientColors[1].withOpacity(0.2),
+                                                    gradientColors[0].withValues(alpha: 0.2),
+                                                    gradientColors[1].withValues(alpha: 0.2),
                                                   ],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
                                                 borderRadius: BorderRadius.circular(16),
-                                                border: Border.all(color: gradientColors[0].withOpacity(0.3)),
+                                                border: Border.all(color: gradientColors[0].withValues(alpha: 0.3)),
                                               ),
                                               child: Text(
                                                 subject,
                                                 style: TextStyle(
                                                   fontSize: 12, 
-                                                  color: gradientColors[0].withOpacity(0.8),
+                                                  color: gradientColors[0].withValues(alpha: 0.8),
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
@@ -978,7 +978,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                             ),
                             border: Border(
                               top: BorderSide(
-                                color: gradientColors[0].withOpacity(0.2),
+                                color: gradientColors[0].withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
@@ -1049,9 +1049,9 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1063,7 +1063,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -1400,7 +1400,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                                 final student = filteredStudents[index];
                                 return ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: _accentColor.withOpacity(0.2),
+                                    backgroundColor: _accentColor.withValues(alpha: 0.2),
                                     child: Text(
                                       student['name'].toString().substring(0, 1),
                                       style: TextStyle(color: _accentColor),
@@ -1553,7 +1553,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -1562,7 +1562,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: color, size: 28),
@@ -1593,9 +1593,9 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: color.withOpacity(0.3)),
+                    border: Border.all(color: color.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     value,
@@ -2504,7 +2504,7 @@ class _ClassManagementScreenState extends State<ClassManagementScreen> {
                               ),
                               label: Text(teacher['name']),
                               backgroundColor: Colors.white,
-                              side: BorderSide(color: _accentColor.withOpacity(0.5)),
+                              side: BorderSide(color: _accentColor.withValues(alpha: 0.5)),
                               deleteIcon: const Icon(Icons.close, size: 18),
                               onDeleted: () {
                                 setState(() {

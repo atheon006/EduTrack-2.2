@@ -525,7 +525,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [theme.primaryColor.withOpacity(0.05), Colors.white],
+                  colors: [theme.primaryColor.withValues(alpha: 0.05), Colors.white],
                 ),
               ),
               child: Column(
@@ -560,7 +560,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                             shape: BoxShape.circle,
                           ),
                           todayDecoration: BoxDecoration(
-                            color: theme.primaryColor.withOpacity(0.5),
+                            color: theme.primaryColor.withValues(alpha: 0.5),
                             shape: BoxShape.circle,
                           ),
                           selectedDecoration: BoxDecoration(
@@ -569,13 +569,13 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                           ),
                           outsideDaysVisible: false,
                           markersMaxCount: 3,
-                          weekendTextStyle: TextStyle(color: theme.primaryColor.withOpacity(0.7)),
+                          weekendTextStyle: TextStyle(color: theme.primaryColor.withValues(alpha: 0.7)),
                           holidayTextStyle: const TextStyle(color: Color(0xFFE53935)),
                         ),
                         headerStyle: HeaderStyle(
                           titleCentered: true,
                           formatButtonDecoration: BoxDecoration(
-                            color: theme.primaryColor.withOpacity(0.1),
+                            color: theme.primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           formatButtonTextStyle: TextStyle(color: theme.primaryColor),
@@ -677,7 +677,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         side: BorderSide(
-                                          color: event.category.color.withOpacity(0.3),
+                                          color: event.category.color.withValues(alpha: 0.3),
                                           width: 1,
                                         ),
                                       ),
@@ -692,7 +692,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                                               Container(
                                                 padding: const EdgeInsets.all(8),
                                                 decoration: BoxDecoration(
-                                                  color: event.category.color.withOpacity(0.1),
+                                                  color: event.category.color.withValues(alpha: 0.1),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: Icon(
@@ -729,7 +729,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                                                         Container(
                                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                           decoration: BoxDecoration(
-                                                            color: event.category.color.withOpacity(0.1),
+                                                            color: event.category.color.withValues(alpha: 0.1),
                                                             borderRadius: BorderRadius.circular(12),
                                                           ),
                                                           child: Text(
@@ -820,8 +820,8 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                       fontSize: 13,
                     ),
                   ),
-                  backgroundColor: isSelected ? category.color.withOpacity(0.1) : Colors.grey[100],
-                  selectedColor: category.color.withOpacity(0.2),
+                  backgroundColor: isSelected ? category.color.withValues(alpha: 0.1) : Colors.grey[100],
+                  selectedColor: category.color.withValues(alpha: 0.2),
                   checkmarkColor: category.color,
                   selected: isSelected,
                   onSelected: (selected) => _toggleCategory(category),
@@ -918,7 +918,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                 margin: const EdgeInsets.only(bottom: 6),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: isSelected ? category.color.withOpacity(0.1) : Colors.transparent,
+                  color: isSelected ? category.color.withValues(alpha: 0.1) : Colors.transparent,
                 ),
                 child: CheckboxListTile(
                   title: Row(
@@ -926,7 +926,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: category.color.withOpacity(0.2),
+                          color: category.color.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(category.icon, color: category.color, size: 20),
@@ -1019,7 +1019,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: event.category.color.withOpacity(0.1),
+                    color: event.category.color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(event.category.icon, color: event.category.color, size: 24),
@@ -1031,7 +1031,7 @@ class _AcademicCalenderScreenState extends State<AcademicCalenderScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: event.category.color.withOpacity(0.1),
+                        color: event.category.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(

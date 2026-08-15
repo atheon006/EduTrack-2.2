@@ -372,7 +372,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     gradient: LinearGradient(
-                      colors: [Colors.white, _accentColor.withOpacity(0.1)],
+                      colors: [Colors.white, _accentColor.withValues(alpha: 0.1)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -459,9 +459,9 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
       width: 80,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -683,7 +683,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: subjectColor.withOpacity(0.2),
+                          color: subjectColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(Icons.book, color: subjectColor),
@@ -710,7 +710,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: subjectColor.withOpacity(0.2),
+                          color: subjectColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: subjectColor, width: 1),
                         ),
@@ -885,7 +885,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: attendanceColor.withOpacity(0.2),
+                    backgroundColor: attendanceColor.withValues(alpha: 0.2),
                     child: Icon(
                       attendanceStatus == 'Present'
                           ? Icons.check_circle
@@ -897,7 +897,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                   trailing: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: attendanceColor.withOpacity(0.1),
+                      color: attendanceColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -1066,7 +1066,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: termColor.withOpacity(0.1),
+                          color: termColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -1113,7 +1113,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: termColor.withOpacity(0.1),
+                              color: termColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -1217,9 +1217,9 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
       width: 100,
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1299,22 +1299,22 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
   }) {
     return Card(
       elevation: 3,
-      shadowColor: color.withOpacity(0.4),
+      shadowColor: color.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: color.withOpacity(0.1), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.1), width: 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
-        splashColor: color.withOpacity(0.1),
-        highlightColor: color.withOpacity(0.05),
+        splashColor: color.withValues(alpha: 0.1),
+        highlightColor: color.withValues(alpha: 0.05),
         child: Stack(
           children: [
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.white, color.withOpacity(0.05)],
+                  colors: [Colors.white, color.withValues(alpha: 0.05)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -1327,7 +1327,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
+                      color: color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(icon, color: color, size: 26),
@@ -1405,14 +1405,14 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _accentColor.withOpacity(0.1),
+                        color: _accentColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(Icons.dashboard, color: _accentColor),
                     ),
                     title: const Text('Dashboard'),
                     selected: true,
-                    selectedTileColor: _accentColor.withOpacity(0.1),
+                    selectedTileColor: _accentColor.withValues(alpha: 0.1),
                     onTap: () {
                       Navigator.pop(context);
                     },
@@ -1523,7 +1523,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: color, size: 22),
@@ -1552,7 +1552,7 @@ class _ParentDashboardState extends State<ParentDashboard> with SingleTickerProv
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      hoverColor: color.withOpacity(0.05),
+      hoverColor: color.withValues(alpha: 0.05),
       selectedColor: color,
     );
   }

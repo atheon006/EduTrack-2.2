@@ -708,7 +708,7 @@ class _TeacherNotificationsScreenState extends State<TeacherNotificationsScreen>
           Icon(
             Icons.notifications_off,
             size: 80,
-            color: _textSecondaryColor.withOpacity(0.5),
+            color: _textSecondaryColor.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -746,7 +746,7 @@ class _TeacherNotificationsScreenState extends State<TeacherNotificationsScreen>
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: notification.getTypeColor().withOpacity(0.2),
+          backgroundColor: notification.getTypeColor().withValues(alpha: 0.2),
           child: Icon(
             notification.getTypeIcon(),
             color: notification.getTypeColor(),

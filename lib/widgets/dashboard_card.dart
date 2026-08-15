@@ -85,13 +85,13 @@ class _DashboardCardState extends State<DashboardCard> with SingleTickerProvider
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: widget.color.withOpacity(_isPressed ? 0.3 : 0.1),
+                color: widget.color.withValues(alpha: _isPressed ? 0.3 : 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
             border: Border.all(
-              color: widget.color.withOpacity(0.1),
+              color: widget.color.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -106,7 +106,7 @@ class _DashboardCardState extends State<DashboardCard> with SingleTickerProvider
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: widget.color.withOpacity(0.15),
+                        color: widget.color.withValues(alpha: 0.15),
                       ),
                       child: Icon(
                         widget.icon,

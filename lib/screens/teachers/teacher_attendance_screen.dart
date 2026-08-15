@@ -297,7 +297,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
             Icon(
               Icons.class_,
               size: 64,
-              color: _textSecondaryColor.withOpacity(0.5),
+              color: _textSecondaryColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -412,7 +412,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: classColor.withOpacity(0.1),
+            color: classColor.withValues(alpha: 0.1),
             border: Border(
               bottom: BorderSide(color: Colors.grey.shade300, width: 1),
             ),
@@ -440,9 +440,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.green.withOpacity(0.3)),
+                            border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -523,7 +523,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                     Icon(
                       Icons.person_off,
                       size: 80,
-                      color: _textSecondaryColor.withOpacity(0.5),
+                      color: _textSecondaryColor.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -553,14 +553,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                     margin: const EdgeInsets.only(bottom: 8),
                     elevation: 0,
                     color: student['present'] 
-                      ? Colors.green.withOpacity(0.1) 
-                      : Colors.red.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1) 
+                      : Colors.red.withValues(alpha: 0.1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
                         color: student['present'] 
-                          ? Colors.green.withOpacity(0.3) 
-                          : Colors.red.withOpacity(0.3),
+                          ? Colors.green.withValues(alpha: 0.3) 
+                          : Colors.red.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -608,7 +608,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
               color: _cardColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withValues(alpha: 0.2),
                   spreadRadius: 1,
                   blurRadius: 5,
                   offset: const Offset(0, -3),

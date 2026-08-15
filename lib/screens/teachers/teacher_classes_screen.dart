@@ -195,7 +195,7 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
           Icon(
             Icons.error_outline,
             size: 80,
-            color: Colors.red.withOpacity(0.5),
+            color: Colors.red.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -237,7 +237,7 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
           Icon(
             Icons.class_outlined,
             size: 80,
-            color: _textSecondaryColor.withOpacity(0.5),
+            color: _textSecondaryColor.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -281,7 +281,7 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: classColor.withOpacity(0.1),
+                color: classColor.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -320,7 +320,7 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: classColor.withOpacity(0.1),
+                      color: classColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

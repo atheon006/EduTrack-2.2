@@ -205,7 +205,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
           controller: _tabController,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
           tabs: const [
             Tab(text: 'Active'),
             Tab(text: 'Past'),
@@ -251,7 +251,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
           Icon(
             Icons.error_outline,
             size: 80,
-            color: Colors.red.withOpacity(0.5),
+            color: Colors.red.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -294,7 +294,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
             Icon(
               Icons.assignment_outlined,
               size: 80,
-              color: _textSecondaryColor.withOpacity(0.5),
+              color: _textSecondaryColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -345,7 +345,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
           children: [
             Container(
               decoration: BoxDecoration(
-                color: cardColor.withOpacity(0.1),
+                color: cardColor.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -421,7 +421,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -644,7 +644,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(status).withOpacity(0.1),
+                            color: _getStatusColor(status).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -1100,7 +1100,7 @@ class _TeacherAssignmentsScreenState extends State<TeacherAssignmentsScreen> wit
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: _primaryColor.withOpacity(0.1),
+                              color: _primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

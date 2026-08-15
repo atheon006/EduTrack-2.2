@@ -454,7 +454,7 @@ class _SchoolSelectionScreenState extends State<SchoolSelectionScreen> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: primaryColor.withOpacity(0.3),
+                            color: primaryColor.withValues(alpha: 0.3),
                             blurRadius: 15,
                             spreadRadius: 5,
                           ),
@@ -504,7 +504,7 @@ class _SchoolSelectionScreenState extends State<SchoolSelectionScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 8,
-                    shadowColor: primaryColor.withOpacity(0.4),
+                    shadowColor: primaryColor.withValues(alpha: 0.4),
                     // Explicitly set the card color to white
                     color: Colors.white, 
                     surfaceTintColor: Colors.white, // Important for Material 3
@@ -576,7 +576,7 @@ class _SchoolSelectionScreenState extends State<SchoolSelectionScreen> {
                                   foregroundColor: Colors.white,
                                   minimumSize: const Size(double.infinity, 54),
                                   elevation: 4,
-                                  shadowColor: primaryColor.withOpacity(0.5),
+                                  shadowColor: primaryColor.withValues(alpha: 0.5),
                                 ),
                                 child: _isLoading
                                     ? SizedBox(
@@ -655,23 +655,23 @@ class _SchoolSelectionScreenState extends State<SchoolSelectionScreen> {
                       child: InkWell(
                         onTap: () => _schoolIdController.text = _schools[index]['id'],
                         borderRadius: BorderRadius.circular(12),
-                        splashColor: primaryColor.withOpacity(0.1),
-                        highlightColor: primaryColor.withOpacity(0.05),
+                        splashColor: primaryColor.withValues(alpha: 0.1),
+                        highlightColor: primaryColor.withValues(alpha: 0.05),
                         child: Card(
                           color: Colors.white,
                           surfaceTintColor: Colors.white,
                           elevation: 3,
-                          shadowColor: accentColor.withOpacity(0.2),
+                          shadowColor: accentColor.withValues(alpha: 0.2),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: accentColor.withOpacity(0.2)),
+                            side: BorderSide(color: accentColor.withValues(alpha: 0.2)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Row(
                               children: [
                                 CircleAvatar(
-                                  backgroundColor: primaryColor.withOpacity(0.1),
+                                  backgroundColor: primaryColor.withValues(alpha: 0.1),
                                   child: Icon(
                                     Icons.school_outlined,
                                     color: accentColor,

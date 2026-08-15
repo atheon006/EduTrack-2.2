@@ -159,7 +159,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     spreadRadius: 5,
                     blurRadius: 15,
                     offset: const Offset(0, 5),
@@ -210,7 +210,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -222,7 +222,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
         children: [
           Container(
             decoration: BoxDecoration(
-              color: _primaryColor.withOpacity(0.1),
+              color: _primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -241,7 +241,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [_primaryColor.withOpacity(0.1), _accentColor.withOpacity(0.1)],
+                  colors: [_primaryColor.withValues(alpha: 0.1), _accentColor.withValues(alpha: 0.1)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -270,7 +270,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
           ),
           Container(
             decoration: BoxDecoration(
-              color: _primaryColor.withOpacity(0.1),
+              color: _primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -370,7 +370,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.withOpacity(0.3),
+                        color: Colors.green.withValues(alpha: 0.3),
                         spreadRadius: 1,
                         blurRadius: 6,
                         offset: const Offset(0, 2),
@@ -424,7 +424,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     spreadRadius: 5,
                     blurRadius: 15,
                     offset: const Offset(0, 5),
@@ -466,15 +466,15 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_primaryColor.withOpacity(0.1), _accentColor.withOpacity(0.1)],
+            colors: [_primaryColor.withValues(alpha: 0.1), _accentColor.withValues(alpha: 0.1)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: _primaryColor.withOpacity(0.2), width: 1),
+          border: Border.all(color: _primaryColor.withValues(alpha: 0.2), width: 1),
           boxShadow: [
             BoxShadow(
-              color: _primaryColor.withOpacity(0.1),
+              color: _primaryColor.withValues(alpha: 0.1),
               spreadRadius: 2,
               blurRadius: 10,
               offset: const Offset(0, 4),
@@ -497,7 +497,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _primaryColor.withOpacity(0.3),
+                        color: _primaryColor.withValues(alpha: 0.3),
                         spreadRadius: 1,
                         blurRadius: 6,
                         offset: const Offset(0, 2),
@@ -540,15 +540,15 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_primaryColor.withOpacity(0.1), _accentColor.withOpacity(0.1)],
+            colors: [_primaryColor.withValues(alpha: 0.1), _accentColor.withValues(alpha: 0.1)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: _primaryColor.withOpacity(0.2), width: 1),
+          border: Border.all(color: _primaryColor.withValues(alpha: 0.2), width: 1),
           boxShadow: [
             BoxShadow(
-              color: _primaryColor.withOpacity(0.1),
+              color: _primaryColor.withValues(alpha: 0.1),
               spreadRadius: 2,
               blurRadius: 10,
               offset: const Offset(0, 4),
@@ -571,7 +571,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _primaryColor.withOpacity(0.3),
+                        color: _primaryColor.withValues(alpha: 0.3),
                         spreadRadius: 1,
                         blurRadius: 6,
                         offset: const Offset(0, 2),
@@ -729,7 +729,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: classItem['color'].withOpacity(0.2),
+            color: classItem['color'].withValues(alpha: 0.2),
             spreadRadius: 2,
             blurRadius: 15,
             offset: const Offset(0, 5),
@@ -744,14 +744,14 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [classItem['color'], classItem['color'].withOpacity(0.8)],
+                  colors: [classItem['color'], classItem['color'].withValues(alpha: 0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: classItem['color'].withOpacity(0.3),
+                    color: classItem['color'].withValues(alpha: 0.3),
                     spreadRadius: 1,
                     blurRadius: 8,
                     offset: const Offset(0, 3),
@@ -798,7 +798,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [classItem['color'], classItem['color'].withOpacity(0.8)],
+                    colors: [classItem['color'], classItem['color'].withValues(alpha: 0.8)],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -873,7 +873,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: classItem['color'].withOpacity(0.2),
+                  backgroundColor: classItem['color'].withValues(alpha: 0.2),
                   child: Icon(Icons.class_, color: classItem['color']),
                 ),
                 title: Text(
@@ -936,7 +936,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: _primaryColor.withOpacity(0.1),
+        color: _primaryColor.withValues(alpha: 0.1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1053,7 +1053,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _accentColor.withOpacity(0.1),
+                    color: _accentColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: _accentColor, width: 1),
                   ),
@@ -1072,7 +1072,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.green, width: 1),
                   ),
@@ -1192,7 +1192,7 @@ class _StudentScheduleScreenState extends State<StudentScheduleScreen> with Sing
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: classItem['color'].withOpacity(0.2),
+                        color: classItem['color'].withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(

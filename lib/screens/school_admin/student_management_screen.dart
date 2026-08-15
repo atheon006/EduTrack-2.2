@@ -326,7 +326,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_primaryColor, _primaryColor.withOpacity(0.8)],
+              colors: [_primaryColor, _primaryColor.withValues(alpha: 0.8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -400,7 +400,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                   gradient: LinearGradient(
                                     colors: [
                                       _primaryColor,
-                                      _primaryColor.withOpacity(0.8)
+                                      _primaryColor.withValues(alpha: 0.8)
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -425,7 +425,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
+                                        color: Colors.white.withValues(alpha: 0.3),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -525,7 +525,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                       return Card(
                                         elevation: 3,
                                         shadowColor:
-                                            gradientColors[0].withOpacity(0.3),
+                                            gradientColors[0].withValues(alpha: 0.3),
                                         margin: const EdgeInsets.symmetric(
                                             horizontal: 12.0, vertical: 8.0),
                                         shape: RoundedRectangleBorder(
@@ -575,7 +575,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                                             color:
                                                                 gradientColors[
                                                                         0]
-                                                                    .withOpacity(
+                                                                    .withValues(alpha: 
                                                                         0.3),
                                                             blurRadius: 8,
                                                             offset:
@@ -669,7 +669,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                                   border: Border(
                                                     top: BorderSide(
                                                       color: gradientColors[0]
-                                                          .withOpacity(0.2),
+                                                          .withValues(alpha: 0.2),
                                                       width: 1,
                                                     ),
                                                   ),
@@ -873,14 +873,14 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_accentColor, _accentColor.withOpacity(0.8)],
+            colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: _accentColor.withOpacity(0.4),
+              color: _accentColor.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -1047,7 +1047,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               spreadRadius: 1,
               offset: const Offset(0, -2),
@@ -1064,14 +1064,14 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [_accentColor, _accentColor.withOpacity(0.8)],
+                      colors: [_accentColor, _accentColor.withValues(alpha: 0.8)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _accentColor.withOpacity(0.3),
+                        color: _accentColor.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       )
@@ -1109,7 +1109,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                 gradient: LinearGradient(
                   colors: [
                     Colors.blue.shade50,
-                    Colors.blue.shade100.withOpacity(0.3),
+                    Colors.blue.shade100.withValues(alpha: 0.3),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -1216,8 +1216,8 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       selected: selected,
       onSelected: onSelected,
       backgroundColor: Colors.white,
-      selectedColor: color.withOpacity(0.15),
-      checkmarkColor: color.withOpacity(0.8),
+      selectedColor: color.withValues(alpha: 0.15),
+      checkmarkColor: color.withValues(alpha: 0.8),
       labelStyle: TextStyle(
         color: selected ? color : Colors.black87,
         fontWeight: selected ? FontWeight.bold : FontWeight.normal,
@@ -1455,7 +1455,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                 padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_accentColor, _accentColor.withOpacity(0.7)],
+                    colors: [_accentColor, _accentColor.withValues(alpha: 0.7)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -1463,7 +1463,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                       const BorderRadius.vertical(top: Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(
-                      color: _accentColor.withOpacity(0.3),
+                      color: _accentColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -1503,7 +1503,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                               Text(
                                 'Grade $grade$section | $className',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 16,
                                 ),
                               ),
@@ -1517,13 +1517,13 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 6, horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'ID: $studentId',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1738,9 +1738,9 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

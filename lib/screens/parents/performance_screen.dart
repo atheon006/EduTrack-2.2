@@ -300,7 +300,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: isSelected ? _primaryColor.withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                color: isSelected ? _primaryColor.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.1),
                 border: Border.all(
                   color: isSelected ? _primaryColor : Colors.transparent,
                   width: 2,
@@ -332,7 +332,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
                           student['grade'],
                           style: TextStyle(
                             fontSize: 12,
-                            color: isSelected ? _primaryColor.withOpacity(0.8) : Colors.grey[600],
+                            color: isSelected ? _primaryColor.withValues(alpha: 0.8) : Colors.grey[600],
                           ),
                         ),
                       ],
@@ -369,7 +369,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [_primaryColor, _primaryColor.withOpacity(0.7)],
+                  colors: [_primaryColor, _primaryColor.withValues(alpha: 0.7)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -665,7 +665,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: (highestSubject['color'] as Color).withOpacity(0.2),
+                                color: (highestSubject['color'] as Color).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Icon(
@@ -720,7 +720,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.2),
+                      color: Colors.orange.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(
@@ -794,7 +794,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: subjectColor.withOpacity(0.2),
+                    color: subjectColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.book, color: subjectColor),
@@ -818,7 +818,7 @@ class _ParentPerformanceScreenState extends State<ParentPerformanceScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: subjectColor.withOpacity(0.2),
+                    color: subjectColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: subjectColor, width: 1),
                   ),

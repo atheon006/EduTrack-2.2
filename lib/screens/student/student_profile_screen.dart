@@ -333,7 +333,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         spreadRadius: 1,
                         blurRadius: 3,
                       ),
@@ -363,7 +363,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -378,7 +378,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           Text(
             'ID: $studentId',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 16,
             ),
           ),
@@ -386,7 +386,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           Text(
             'School: $schoolName', // Display school name
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 16,
             ),
           ),

@@ -385,7 +385,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -411,7 +411,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
                 Text(
                   'Track performance and attendance metrics',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 14,
                   ),
                 ),
@@ -724,7 +724,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.grade, color: Colors.white, size: 24),
@@ -774,9 +774,9 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
   Widget _buildAnalyticsGridItem(String label, String value, IconData icon) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -796,7 +796,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
             label,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -890,7 +890,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard>
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: _getAttendanceColor(attendancePct).withOpacity(0.1),
+                            color: _getAttendanceColor(attendancePct).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
