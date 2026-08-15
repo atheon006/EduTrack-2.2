@@ -40,49 +40,51 @@ class DefaultFirebaseOptions {
     }
   }
 
+  // ─── PROJET : copa-ecole ────────────────────────────────────────────────────
+
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCU_A46qSy-gDHx6lHrkm8QWaixxFVDjjU',
-    appId: '1:371745891018:web:23a9a2c316c5ec0e88ca33',
-    messagingSenderId: '371745891018',
-    projectId: 'school-e04b8',
-    authDomain: 'school-e04b8.firebaseapp.com',
-    storageBucket: 'school-e04b8.firebasestorage.app',
-    measurementId: 'G-WR6VHEED9Q',
+    apiKey: 'AIzaSyBb2ilgOPQZn9WwLM1jK0yRbeWy1eC4tWY',
+    appId: '1:786691292552:web:52b534a326c08d29b04e3d',
+    messagingSenderId: '786691292552',
+    projectId: 'copa-ecole',
+    authDomain: 'copa-ecole.firebaseapp.com',
+    storageBucket: 'copa-ecole.firebasestorage.app',
+    measurementId: 'G-XFLYQ8RBV6',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAp7XmDYOuQsHS0obhS3WW1ZmtPmq8pD-E',
-    appId: '1:371745891018:android:f7f82bbd0a559a6788ca33',
-    messagingSenderId: '371745891018',
-    projectId: 'school-e04b8',
-    storageBucket: 'school-e04b8.firebasestorage.app',
+    apiKey: 'AIzaSyBkJqJNltWjuEh-O-9vSqG62OF0BX0fNwE',
+    appId: '1:786691292552:android:56df98289b77ea27b04e3d',
+    messagingSenderId: '786691292552',
+    projectId: 'copa-ecole',
+    storageBucket: 'copa-ecole.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCikqidxUUGWVuUJ2qnyx-19inxkwPxd-o',
-    appId: '1:371745891018:ios:c5354e68a2b6551388ca33',
-    messagingSenderId: '371745891018',
-    projectId: 'school-e04b8',
-    storageBucket: 'school-e04b8.firebasestorage.app',
-    iosBundleId: 'com.schoolmanagement.schoolApp',
+    apiKey: 'AIzaSyBb2ilgOPQZn9WwLM1jK0yRbeWy1eC4tWY',
+    appId: '1:786691292552:web:52b534a326c08d29b04e3d',
+    messagingSenderId: '786691292552',
+    projectId: 'copa-ecole',
+    storageBucket: 'copa-ecole.firebasestorage.app',
+    iosBundleId: 'com.edutrack.school_app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCikqidxUUGWVuUJ2qnyx-19inxkwPxd-o',
-    appId: '1:371745891018:ios:c5354e68a2b6551388ca33',
-    messagingSenderId: '371745891018',
-    projectId: 'school-e04b8',
-    storageBucket: 'school-e04b8.firebasestorage.app',
-    iosBundleId: 'com.schoolmanagement.schoolApp',
+    apiKey: 'AIzaSyBb2ilgOPQZn9WwLM1jK0yRbeWy1eC4tWY',
+    appId: '1:786691292552:web:52b534a326c08d29b04e3d',
+    messagingSenderId: '786691292552',
+    projectId: 'copa-ecole',
+    storageBucket: 'copa-ecole.firebasestorage.app',
+    iosBundleId: 'com.edutrack.school_app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCU_A46qSy-gDHx6lHrkm8QWaixxFVDjjU',
-    appId: '1:371745891018:web:c05ffd764f02899688ca33',
-    messagingSenderId: '371745891018',
-    projectId: 'school-e04b8',
-    authDomain: 'school-e04b8.firebaseapp.com',
-    storageBucket: 'school-e04b8.firebasestorage.app',
-    measurementId: 'G-PHPHR8M6DZ',
+    apiKey: 'AIzaSyBb2ilgOPQZn9WwLM1jK0yRbeWy1eC4tWY',
+    appId: '1:786691292552:web:52b534a326c08d29b04e3d',
+    messagingSenderId: '786691292552',
+    projectId: 'copa-ecole',
+    authDomain: 'copa-ecole.firebaseapp.com',
+    storageBucket: 'copa-ecole.firebasestorage.app',
+    measurementId: 'G-XFLYQ8RBV6',
   );
 }

@@ -55,6 +55,13 @@ class FirestoreServiceRDC {
     googleProvider.addScope('email');
     googleProvider.addScope('profile');
 
+    // Web OAuth 2.0 Client ID (copa-ecole) — requis pour signInWithPopup sur Flutter Web
+    if (kIsWeb) {
+      googleProvider.setCustomParameters({
+        'client_id': '786691292552-neuda6294ea8a6af9dm8tk7k6da5enlo.apps.googleusercontent.com',
+      });
+    }
+
     try {
       if (kIsWeb) {
         try {

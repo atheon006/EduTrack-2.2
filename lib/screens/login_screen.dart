@@ -331,31 +331,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
 
                     // Google Sign-In Primary Button
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       onPressed: _isLoading ? null : _handleGoogleSignIn,
-                      icon: _isLoading
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1F1F1F),
+                        elevation: 3,
+                        shadowColor: Colors.black26,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: const BorderSide(color: Color(0xFFDADCE0)),
+                        ),
+                      ),
+                      child: _isLoading
                           ? const SizedBox(
                               width: 22,
                               height: 22,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                              child: CircularProgressIndicator(
+                                  color: Color(0xFF4285F4), strokeWidth: 2.5),
                             )
-                          : const Icon(Icons.g_mobiledata_rounded, size: 34, color: Colors.white),
-                      label: Text(
-                        _isLoading ? 'Connexion en cours...' : 'Se connecter avec Google',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(56),
-                        backgroundColor: roleColor,
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Vrai logo Google coloré (SVG inline)
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CustomPaint(painter: _GoogleLogoPainter()),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Se connecter avec Google',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1F1F1F),
+                                    letterSpacing: 0.1,
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                     const SizedBox(height: 20),
 
@@ -383,4 +399,57 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
+
+/// Peint le vrai logo Google "G" coloré avec les 4 couleurs officielles Google
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Fond blanc circulaire
+    paint.color = Colors.white;
+    canvas.drawCircle(center, radius, paint);
+
+    // Segments colorés du G Google (4 couleurs officielles Google)
+    canvas.save();
+    canvas.translate(size.width * 0.5, size.height * 0.5);
+    final rect = Rect.fromCircle(center: Offset.zero, radius: size.width * 0.42);
+
+    // Cercle coloré avec découpe centrale pour former le G
+    // Rouge (#EA4335) - quart supérieur gauche
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(rect, -2.36, 1.57, true, paint);
+
+    // Jaune (#FBBC05) - quart inférieur gauche
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(rect, -0.79, -1.57, true, paint);
+
+    // Vert (#34A853) - quart inférieur droit
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(rect, 0.79, 1.57, true, paint);
+
+    // Bleu (#4285F4) - quart supérieur droit + barre
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(rect, -2.36, -1.57, true, paint);
+
+    // Centre blanc pour créer l'anneau
+    paint.color = Colors.white;
+    canvas.drawCircle(Offset.zero, size.width * 0.22, paint);
+
+    // Barre horizontale du G (bleue)
+    final barRect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, -size.height * 0.09, size.width * 0.42, size.height * 0.18),
+      Radius.circular(size.height * 0.09),
+    );
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawRRect(barRect, paint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
