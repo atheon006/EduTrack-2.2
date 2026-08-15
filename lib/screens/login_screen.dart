@@ -102,6 +102,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Traduit les erreurs techniques en messages simples pour l'utilisateur
+  String _traduireErreur(String erreur) {
+    if (erreur.contains('popup_closed') || erreur.contains('popup-closed')) {
+      return 'La fenêtre Google a été fermée. Réessaie.';
+    }
+    if (erreur.contains('cancelled') || erreur.contains('canceled')) {
+      return 'Connexion annulée. Réessaie quand tu veux.';
+    }
+    if (erreur.contains('network') || erreur.contains('Network')) {
+      return 'Pas de connexion internet. Vérifie ta connexion et réessaie.';
+    }
+    if (erreur.contains('permission-denied') || erreur.contains('PERMISSION_DENIED')) {
+      return 'Accès refusé. Ton compte n\'est pas autorisé pour cette action.';
+    }
+    if (erreur.contains('configuration-not-found')) {
+      return 'Problème de configuration. Contacte l\'administrateur.';
+    }
+    if (erreur.contains('account-exists')) {
+      return 'Un compte existe déjà avec cette adresse. Connecte-toi directement.';
+    }
+    if (erreur.contains('too-many-requests')) {
+      return 'Trop de tentatives. Attends quelques minutes et réessaie.';
+    }
+    if (erreur.contains('Redirection')) {
+      return 'Redirection vers Google en cours...';
+    }
+    return 'Une erreur s\'est produite. Réessaie ou contacte le support.';
+  }
+
   void _navigateBasedOnRole(String role, User user) {
     if (!mounted) return;
 
@@ -240,10 +269,13 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final message = _traduireErreur(e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur de connexion Google : $e'),
-            backgroundColor: Colors.red,
+            content: Text(message),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
