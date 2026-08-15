@@ -1,6 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 /// A utility class for handling local storage operations
 /// with proper error handling and fallback mechanisms
@@ -66,7 +65,7 @@ class StorageUtil {
       // Force commit the preferences to disk (important for some devices)
       // Only for Android platform
       try {
-        if (!kIsWeb && Platform.isAndroid) {
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
           await _prefsInstance!.commit();
         }
       } catch (e) {
@@ -111,7 +110,7 @@ class StorageUtil {
         
         // Force commit for Android
         try {
-          if (!kIsWeb && Platform.isAndroid) {
+          if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
             await _prefsInstance!.commit();
           }
         } catch (e) {
@@ -157,7 +156,7 @@ class StorageUtil {
         
         // Force commit for Android
         try {
-          if (!kIsWeb && Platform.isAndroid) {
+          if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
             await _prefsInstance!.commit();
           }
         } catch (e) {
@@ -186,7 +185,7 @@ class StorageUtil {
         await _prefsInstance!.clear();
         
         // Force commit for Android
-        if (Platform.isAndroid) {
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
           await _prefsInstance!.commit();
         }
         

@@ -1,0 +1,52 @@
+name: EduTrack CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build and Validate EduTrack (Web & Android)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code analysis
+        run: flutter analyze lib/main.dart lib/utils/app_theme.dart lib/utils/theme_notifier.dart lib/config/api_config.dart lib/services/api_service.dart
+
+      - name: Build Web (PWA) Release
+        run: flutter build web --release
+
+      - name: Upload Web Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edutrack-web-release
+          path: build/web
+
+      - name: Build Android AppBundle Release
+        run: flutter build appbundle --release --no-pub
+
+      - name: Upload Android AppBundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edutrack-appbundle-release
+          path: build/app/outputs/bundle/release/app-release.aab

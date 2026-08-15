@@ -5,6 +5,7 @@ import 'dart:async';
 import 'utils/storage_util.dart';
 import 'screens/role_selection_screen.dart';
 import 'utils/app_theme.dart';
+import 'utils/theme_notifier.dart';
 import 'models/user_model.dart';
 import 'screens/school_admin_dashboard.dart';
 import 'screens/student_dashboard.dart';
@@ -12,19 +13,27 @@ import 'screens/teacher_dashboard.dart';
 import 'screens/parent_dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'services/fcm_service.dart';
-import 'firebase_options.dart'; 
-
+import 'firebase_options.dart';
 
 bool _isAppInitialized = false;
+
+/// Global ThemeNotifier instance accessible across the app
+final ThemeNotifier themeNotifier = ThemeNotifier();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase with options
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    if (kDebugMode) {
+      print('⚠️ Firebase initialization info: $e');
+    }
+  }
+
   // Initialize FCM Service
   try {
     final fcmService = FCMService();
@@ -42,8 +51,6 @@ void main() async {
     if (!_isAppInitialized) {
       _isAppInitialized = true;
       await StorageUtil.setString('app_initialized', DateTime.now().toString());
-      // Dump all stored values for debugging
-      await StorageUtil.debugDumpAll();
     } else {
       await StorageUtil.init();
     }
@@ -52,7 +59,7 @@ void main() async {
       print('⚠️ Error initializing storage: $e');
     }
   }
-  
+
   runApp(const MyApp());
 }
 
@@ -60,33 +67,30 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  // Use a completer to handle the initialization once
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
-    // Set preferred orientations
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    
-    // Don't call _initializeApp() here, let the FutureBuilder do it
+
+    // Set preferred orientations for mobile devices
+    if (!kIsWeb) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
   }
-  
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-  
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (kDebugMode) {
@@ -99,11 +103,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'School Management App',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.getTheme(AppTheme.defaultTheme),
-      home: const SplashScreen(),
+    return ListenableBuilder(
+      listenable: themeNotifier,
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'EduTrack',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeNotifier.themeMode,
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }
@@ -124,35 +135,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkLoginStatus() async {
     try {
-      // Add a small delay for better UX
       await Future.delayed(const Duration(seconds: 1));
-      
-      // Check if user is logged in
       final isLoggedIn = await StorageUtil.getBool('isLoggedIn') ?? false;
-      
+
       if (kDebugMode) {
         print('🔍 Checking login status: $isLoggedIn');
       }
-      
+
       if (isLoggedIn) {
-        // Try to restore user session
         await _restoreUserSession();
       } else {
-        // Navigate to school selection
         _navigateToSchoolSelection();
       }
     } catch (e) {
       if (kDebugMode) {
         print('⚠️ Error checking login status: $e');
       }
-      // On error, go to school selection
       _navigateToSchoolSelection();
     }
   }
 
   Future<void> _restoreUserSession() async {
     try {
-      // Get stored user data
       final userId = await StorageUtil.getString('userId') ?? '';
       final userEmail = await StorageUtil.getString('userEmail') ?? '';
       final userRole = await StorageUtil.getString('userRole') ?? '';
@@ -164,24 +168,11 @@ class _SplashScreenState extends State<SplashScreen> {
       final schoolToken = await StorageUtil.getString('schoolToken') ?? '';
       final schoolName = await StorageUtil.getString('schoolName') ?? '';
 
-      if (kDebugMode) {
-        print('🔍 Restoring user session:');
-        print('🔍 User ID: $userId');
-        print('🔍 User Email: $userEmail');
-        print('🔍 User Role: $userRole');
-        print('🔍 School Name: $schoolName');
-      }
-
-      // Validate essential data
       if (userId.isEmpty || userEmail.isEmpty || userRole.isEmpty) {
-        if (kDebugMode) {
-          print('⚠️ Essential user data missing, redirecting to login');
-        }
         _navigateToSchoolSelection();
         return;
       }
 
-      // Create user object from stored data
       final user = User(
         id: userId,
         email: userEmail,
@@ -197,7 +188,6 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
 
-      // Navigate based on role
       _navigateBasedOnRole(userRole, user);
     } catch (e) {
       if (kDebugMode) {
@@ -211,7 +201,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     Widget destinationScreen;
-    
+
     switch (role) {
       case 'school_admin':
         destinationScreen = SchoolAdminDashboard(user: user);
@@ -226,9 +216,6 @@ class _SplashScreenState extends State<SplashScreen> {
         destinationScreen = ParentDashboard(user: user);
         break;
       default:
-        if (kDebugMode) {
-          print('⚠️ Unknown role: $role, redirecting to school selection');
-        }
         _navigateToSchoolSelection();
         return;
     }
@@ -241,70 +228,64 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToSchoolSelection() {
     if (!mounted) return;
-    
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const RoleSelectionScreen(
-         schoolName: "",
-            schoolToken: "",
-            schoolAddress: "",
-            schoolPhone: "",
-
-      )),
+      MaterialPageRoute(
+        builder: (context) => const RoleSelectionScreen(
+          schoolName: "",
+          schoolToken: "",
+          schoolAddress: "",
+          schoolPhone: "",
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.blue.shade100,
-              Colors.white,
-            ],
-          ),
+          color: theme.scaffoldBackgroundColor,
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                Hero(
+              Hero(
                 tag: 'app_logo',
                 child: Container(
-                  height: 120,
-                  width: 120,
-                  child: ClipOval(
-                  child: Image.asset(
-                    'images/logo.png',
-                    fit: BoxFit.cover,
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(
+                    Icons.school_rounded,
+                    size: 56,
+                    color: theme.primaryColor,
                   ),
                 ),
-                ),
-              SizedBox(height: 24),
+              ),
+              const SizedBox(height: 24),
               Text(
-                'School Management',
-                style: TextStyle(
-                  fontSize: 28,
+                'EduTrack',
+                style: theme.textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 127, 131, 134),
+                  letterSpacing: -0.5,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Loading...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                'School Management System',
+                style: theme.textTheme.bodyMedium,
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 32),
               CircularProgressIndicator(
-                color: Colors.blue,
+                color: theme.primaryColor,
               ),
             ],
           ),
@@ -313,4 +294,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

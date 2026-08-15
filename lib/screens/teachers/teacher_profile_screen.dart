@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/user_model.dart';
@@ -36,7 +35,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
     super.initState();
     _teacherService = TeacherService(baseUrl: Constants.apiBaseUrl); // Use the constant for base URL
     _imageService = ImageService();
-     _apiService = ApiService(Constants.apiBaseUrl); // Initialize ApiService
+     _apiService = ApiService(); // Initialize ApiService
     _loadThemeColors();
     _loadTeacherProfile();
     _loadProfileImageFromPrefs();
@@ -168,9 +167,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         _isUploadingImage = true;
       });
       
-      File imageFile = File(pickedFile.path);
-      
-      final updatedImageUrl = await _imageService.updateProfileImage(imageFile);
+      final updatedImageUrl = await _imageService.updateProfileImage(pickedFile);
       
       if (updatedImageUrl != null) {
         setState(() {

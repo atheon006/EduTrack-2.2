@@ -6,7 +6,7 @@ import '../services/schedule_service.dart';
 import '../services/fcm_service.dart';
 import '../services/image_service.dart' as image_service;
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import '../utils/storage_util.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this import
 import 'teachers/teacher_classes_screen.dart';
@@ -1378,7 +1378,7 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
 
       // Upload image
       final imageService = image_service.ImageService();
-      final uploadResult = await imageService.uploadImage(File(image.path));
+      final uploadResult = await imageService.uploadImage(image);
       
       if (uploadResult != null && uploadResult.success) {
         final imageUrl = uploadResult.url;

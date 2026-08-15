@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../school_selection_screen.dart';
 import '../../services/image_service.dart';
@@ -103,9 +102,7 @@ class _SchoolAdminProfileScreenState extends State<SchoolAdminProfileScreen> {
         _isUploadingImage = true;
       });
       
-      File imageFile = File(pickedFile.path);
-      
-      final updatedImageUrl = await _imageService.updateProfileImage(imageFile);
+      final updatedImageUrl = await _imageService.updateProfileImage(pickedFile);
       
       if (updatedImageUrl != null) {
         setState(() {

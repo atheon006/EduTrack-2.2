@@ -1,10 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../utils/constants.dart';
 
 class FCMService {
   static final FCMService _instance = FCMService._internal();
@@ -310,7 +308,7 @@ class FCMService {
         'schoolId': schoolId,
         'role': userRole,    // Changed from 'userRole' to 'role' to match API requirement
         'topic': 'school_$schoolId',  // Changed from 'topicSubscribed' to 'topic'
-        'deviceType': kIsWeb ? 'web' : Platform.operatingSystem.toLowerCase(),
+        'deviceType': kIsWeb ? 'web' : defaultTargetPlatform.name.toLowerCase(),
       };
       
       // Add classId for student role if it exists and is not empty

@@ -13,15 +13,16 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Optional background message handler
+// Background push notification handler for EduTrack PWA
 messaging.onBackgroundMessage((payload) => {
-  console.log("Background message received:", payload);
+  console.log("🔔 [EduTrack SW] Background message received:", payload);
   
-  // Customize notification here
-  const notificationTitle = payload.notification.title || "New Notification";
+  const notificationTitle = payload.notification?.title || "EduTrack Notification";
   const notificationOptions = {
-    body: payload.notification.body || "You have a new notification",
-    icon: "/icons/icon-192x192.png"
+    body: payload.notification?.body || "Vous avez une nouvelle notification EduTrack.",
+    icon: "/icons/Icon-192.png",
+    badge: "/icons/Icon-192.png",
+    data: payload.data || {}
   };
 
   return self.registration.showNotification(notificationTitle, notificationOptions);

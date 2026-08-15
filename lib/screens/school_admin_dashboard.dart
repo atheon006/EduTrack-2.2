@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'; 
 import 'package:image_picker/image_picker.dart';
 import 'package:school_app/screens/role_selection_screen.dart';
-import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart'; 
 import '../models/user_model.dart';
 import '../models/school_model.dart';
@@ -1933,7 +1932,7 @@ Widget _buildModernAdminTool({
 
       // Upload image
       final imageService = image_service.ImageService();
-      final uploadResult = await imageService.uploadImage(File(image.path));
+      final uploadResult = await imageService.uploadImage(image);
       
       if (uploadResult != null && uploadResult.success) {
         final imageUrl = uploadResult.url;

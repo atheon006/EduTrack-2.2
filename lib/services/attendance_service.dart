@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import '../services/api_auth_service.dart';
 
 class AttendanceService {
@@ -157,8 +156,8 @@ class AttendanceService {
     }
   }
 
-  /// Download attendance report as CSV
-  Future<File> downloadAttendanceReport(String attendanceId) async {
+  /// Download attendance report as CSV bytes
+  Future<Uint8List> downloadAttendanceReport(String attendanceId) async {
     try {
       final schoolId = await _authService.getSchoolId();
 
@@ -173,13 +172,7 @@ class AttendanceService {
       final response = await http.get(uri, headers: headers);
 
       if (response.statusCode == 200) {
-        // Get the downloads directory
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/attendance_report_$attendanceId.csv');
-        
-        // Write the CSV data to file
-        await file.writeAsBytes(response.bodyBytes);
-        return file;
+        return response.bodyBytes;
       } else {
         throw Exception('HTTP ${response.statusCode}: ${response.body}');
       }

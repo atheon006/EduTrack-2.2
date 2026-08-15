@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../../models/user_model.dart';
 import '../../utils/app_theme.dart';
@@ -136,9 +135,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
         _isUploadingImage = true;
       });
       
-      File imageFile = File(pickedFile.path);
-      
-      final updatedImageUrl = await _imageService.updateProfileImage(imageFile);
+      final updatedImageUrl = await _imageService.updateProfileImage(pickedFile);
       
       if (updatedImageUrl != null) {
         setState(() {
