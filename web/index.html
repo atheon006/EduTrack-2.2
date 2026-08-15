@@ -7,6 +7,11 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="EduTrack - Application épurée, fluide et performante de gestion scolaire.">
 
+  <!-- Cache control meta tags to force browser to load latest build -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- iOS meta tags & icons for PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,33 +24,12 @@
   <title>EduTrack - Management System</title>
   <link rel="manifest" href="manifest.json">
 
-  <script>
-    const serviceWorkerVersion = null;
-  </script>
   <script src="flutter.js" defer></script>
-
-  <!-- Firebase configuration for FCM -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js')
-          .then(function(registration) {
-            console.log('Service Worker registered with scope:', registration.scope);
-          })
-          .catch(function(err) {
-            console.error('Service Worker registration failed:', err);
-          });
-      });
-    }
-  </script>
 </head>
 <body>
   <script>
     window.addEventListener('load', function(ev) {
       _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             appRunner.runApp();
