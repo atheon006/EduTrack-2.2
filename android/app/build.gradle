@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.edutrack.school_app"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -48,8 +48,8 @@ android {
 
     defaultConfig {
         applicationId "com.edutrack.school_app"
-        minSdkVersion flutter.minSdkVersion
-        targetSdk = 34
+        minSdkVersion 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         // Langues : français (RDC) + anglais
@@ -87,5 +87,5 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
