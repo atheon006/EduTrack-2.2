@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/invitation_model.dart';
 
-/// Écran d'activation de compte Directeur / Préfet via lien crypté à usage unique + Google Auth
+/// Écran d'activation de compte via lien crypté à usage unique (Directeur / Enseignant) + Google Auth
 class InviteActivationScreen extends StatefulWidget {
   final String token;
 
@@ -14,7 +14,7 @@ class InviteActivationScreen extends StatefulWidget {
 
 class _InviteActivationScreenState extends State<InviteActivationScreen> {
   final FirestoreServiceRDC _service = FirestoreServiceRDC();
-  InvitationDirecteur? _invitation;
+  InvitationPersonnel? _invitation;
   bool _chargementInitial = true;
   bool _chargementSoumission = false;
   String? _erreur;
@@ -27,7 +27,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
 
   Future<void> _verifierToken() async {
     try {
-      final inv = await _service.getInvitationParToken(widget.token);
+      final inv = await _service.getInvitationPersonnelParToken(widget.token);
       if (mounted) {
         setState(() {
           _invitation = inv;
@@ -40,7 +40,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _erreur = 'Erreur lors de la vérification du lien d\'invitation : $e';
+          _erreur = 'Lien invalide ou expiré.';
           _chargementInitial = false;
         });
       }
@@ -48,26 +48,25 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
   }
 
   Future<void> _activerCompteAvecGoogle() async {
+    if (_invitation == null) return;
     setState(() => _chargementSoumission = true);
 
     try {
-      final userCred = await _service.connnecterAvecGoogle(roleSouhaite: 'directeur');
+      final userCred = await _service.connnecterAvecGoogle(
+        roleSouhaite: _invitation!.typeRole,
+      );
       final user = userCred.user;
 
       if (user != null) {
-        await _service.consommerInvitationDirecteur(
+        await _service.consommerInvitationPersonnel(
           token: widget.token,
-          motDePasse: 'google_auth_sso',
-          prenom: user.displayName?.split(' ').first ?? 'Directeur',
-          nom: (user.displayName?.split(' ').length ?? 0) > 1
-              ? user.displayName!.split(' ').sublist(1).join(' ')
-              : '',
+          user: user,
         );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Compte Directeur activé avec succès avec votre compte Google !'),
+            SnackBar(
+              content: Text('Compte ${_invitation!.nomRole} activé avec succès avec votre compte Google !'),
               backgroundColor: Colors.green,
             ),
           );
@@ -77,7 +76,10 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+          const SnackBar(
+            content: Text('Une erreur s\'est produite lors de la connexion Google. Réessaie.'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -125,7 +127,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _erreur ?? 'Ce lien a expiré ou a déjà été consommé.',
+                  _erreur ?? 'Ce lien a expiré ou a déjà été utilisé.',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
@@ -143,11 +145,14 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
       );
     }
 
+    final isEnseignant = _invitation!.typeRole == 'enseignant';
+    final roleColor = isEnseignant ? const Color(0xFF0D9488) : const Color(0xFF2563EB);
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Activation Direction Écoles',
+          'Activation Compte ${_invitation!.nomRole}',
           style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -169,12 +174,16 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                        color: roleColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         children: [
-                          const Icon(Icons.verified_user_rounded, size: 44, color: Colors.blue),
+                          Icon(
+                            isEnseignant ? Icons.record_voice_over_rounded : Icons.admin_panel_settings_rounded,
+                            size: 48,
+                            color: roleColor,
+                          ),
                           const SizedBox(height: 10),
                           Text(
                             _invitation!.ecoleNom,
@@ -182,15 +191,16 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? const Color(0xFFEFF6FF) : const Color(0xFF1E40AF),
+                              color: primaryTextColor,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Invitation Direction Réseau EduTrack',
+                            'Invitation pour le rôle de ${_invitation!.nomRole}',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: roleColor,
                             ),
                           ),
                         ],
@@ -199,7 +209,7 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                     const SizedBox(height: 28),
 
                     Text(
-                      'Activez votre compte avec votre adresse Google pour finaliser la prise de fonction.',
+                      'Connecte-toi avec ton compte Google pour activer ton accès. Ce lien unique disparaîtra immédiatement après.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -208,24 +218,39 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       onPressed: _chargementSoumission ? null : _activerCompteAvecGoogle,
-                      icon: _chargementSoumission
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                            )
-                          : const Icon(Icons.g_mobiledata_rounded, size: 34, color: Colors.white),
-                      label: Text(
-                        _chargementSoumission ? 'Activation en cours...' : 'Activer avec mon compte Google',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(54),
-                        backgroundColor: const Color(0xFF2563EB),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1F1F1F),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: const BorderSide(color: Color(0xFFDADCE0)),
+                        ),
                       ),
+                      child: _chargementSoumission
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(color: Color(0xFF4285F4), strokeWidth: 2.5),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.g_mobiledata_rounded, size: 32, color: Color(0xFF4285F4)),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Activer avec mon compte Google',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1F1F1F),
+                                  ),
+                                ),
+                              ],
+                            ),
                     ),
                   ],
                 ),

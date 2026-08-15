@@ -191,34 +191,157 @@ class FirestoreServiceRDC {
     final rawString = '$ecoleId-$emailDirecteur-$timestamp-edutrack-secret-key';
     final token = sha256.convert(utf8.encode(rawString)).toString();
 
-    final invitation = InvitationDirecteur(
+    final invitation = InvitationPersonnel(
       id: '',
       ecoleId: ecoleId,
       ecoleNom: ecoleNom,
-      emailDirecteur: emailDirecteur.trim().toLowerCase(),
+      emailPersonnel: emailDirecteur.trim().toLowerCase(),
       token: token,
+      typeRole: 'directeur',
+      nomRole: 'Directeur',
       estUtilise: false,
       createdAt: DateTime.now(),
       expiresAt: DateTime.now().add(const Duration(days: 7)),
     );
 
-    await _db.collection('invitations_directeurs').add(invitation.toMap());
-    return token;
+    await _db.collection('invitations_personnel').add(invitation.toMap());
+    return 'https://copa-ecole.web.app/invite/$token';
   }
 
-  Future<InvitationDirecteur?> getInvitationParToken(String token) async {
+  Future<String> genererLienInvitationEnseignant({
+    required String ecoleId,
+    required String ecoleNom,
+    required String emailEnseignant,
+  }) async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final rawString = '$ecoleId-$emailEnseignant-$timestamp-edutrack-teacher-key';
+    final token = sha256.convert(utf8.encode(rawString)).toString();
+
+    final invitation = InvitationPersonnel(
+      id: '',
+      ecoleId: ecoleId,
+      ecoleNom: ecoleNom,
+      emailPersonnel: emailEnseignant.trim().toLowerCase(),
+      token: token,
+      typeRole: 'enseignant',
+      nomRole: 'Enseignant',
+      estUtilise: false,
+      createdAt: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
+    );
+
+    await _db.collection('invitations_personnel').add(invitation.toMap());
+    return 'https://copa-ecole.web.app/invite/$token';
+  }
+
+  Future<InvitationPersonnel?> getInvitationPersonnelParToken(String token) async {
+    // 1. Chercher d'abord dans invitations_personnel
     final snap = await _db
+        .collection('invitations_personnel')
+        .where('token', isEqualTo: token)
+        .limit(1)
+        .get();
+
+    if (snap.docs.isNotEmpty) {
+      final doc = snap.docs.first;
+      final inv = InvitationPersonnel.fromMap(doc.data(), doc.id);
+      if (!inv.estUtilise && !inv.estExpire) return inv;
+      return null;
+    }
+
+    // 2. Fallback rétrocompatible dans invitations_directeurs
+    final snapDir = await _db
         .collection('invitations_directeurs')
         .where('token', isEqualTo: token)
         .limit(1)
         .get();
 
-    if (snap.docs.isEmpty) return null;
-    final doc = snap.docs.first;
-    final inv = InvitationDirecteur.fromMap(doc.data(), doc.id);
+    if (snapDir.docs.isNotEmpty) {
+      final doc = snapDir.docs.first;
+      final invDir = InvitationDirecteur.fromMap(doc.data(), doc.id);
+      if (!invDir.estUtilise && !invDir.estExpire) {
+        return InvitationPersonnel(
+          id: invDir.id,
+          ecoleId: invDir.ecoleId,
+          ecoleNom: invDir.ecoleNom,
+          emailPersonnel: invDir.emailDirecteur,
+          token: invDir.token,
+          typeRole: 'directeur',
+          nomRole: 'Directeur',
+          estUtilise: invDir.estUtilise,
+          createdAt: invDir.createdAt,
+          expiresAt: invDir.expiresAt,
+        );
+      }
+    }
 
-    if (inv.estUtilise || inv.estExpire) return null;
-    return inv;
+    return null;
+  }
+
+  Future<InvitationDirecteur?> getInvitationParToken(String token) async {
+    final invPers = await getInvitationPersonnelParToken(token);
+    if (invPers == null) return null;
+    return InvitationDirecteur(
+      id: invPers.id,
+      ecoleId: invPers.ecoleId,
+      ecoleNom: invPers.ecoleNom,
+      emailDirecteur: invPers.emailPersonnel,
+      token: invPers.token,
+      estUtilise: invPers.estUtilise,
+      createdAt: invPers.createdAt,
+      expiresAt: invPers.expiresAt,
+    );
+  }
+
+  Future<void> consommerInvitationPersonnel({
+    required String token,
+    required User user,
+  }) async {
+    final inv = await getInvitationPersonnelParToken(token);
+    if (inv == null) {
+      throw Exception('Lien d\'invitation invalide, expiré ou déjà consommé.');
+    }
+
+    final role = inv.typeRole == 'enseignant'
+        ? RoleUtilisateur.enseignant
+        : RoleUtilisateur.directeur;
+    final displayName = user.displayName ?? inv.emailPersonnel.split('@').first;
+
+    final utilisateur = UtilisateurEduTrack(
+      id: user.uid,
+      email: inv.emailPersonnel.isNotEmpty ? inv.emailPersonnel : (user.email ?? ''),
+      role: role,
+      schoolId: inv.ecoleId,
+      profil: ProfilUtilisateur(
+        prenom: displayName.split(' ').first,
+        nom: displayName.split(' ').length > 1
+            ? displayName.split(' ').sublist(1).join(' ')
+            : '',
+        photoProfil: user.photoURL ?? '',
+      ),
+      estActif: true,
+      createdAt: DateTime.now(),
+    );
+
+    await sauvegarderUtilisateur(utilisateur);
+
+    if (role == RoleUtilisateur.directeur) {
+      await _db.collection('ecoles_rdc').doc(inv.ecoleId).set({
+        'directeurId': user.uid,
+        'directeurNom': displayName,
+      }, SetOptions(merge: true));
+    }
+
+    // Marquer l'invitation comme utilisée dans sa collection d'origine
+    await _db.collection('invitations_personnel').doc(inv.id).set({
+      'estUtilise': true,
+      'utiliseLe': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    await _db.collection('invitations_directeurs').doc(inv.id).set({
+      'estUtilise': true,
+      'utiliseLe': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   Future<void> consommerInvitationDirecteur({
@@ -227,48 +350,10 @@ class FirestoreServiceRDC {
     required String prenom,
     required String nom,
   }) async {
-    final inv = await getInvitationParToken(token);
-    if (inv == null) {
-      throw Exception('Lien d\'invitation invalide, expiré ou déjà consommé.');
+    final user = _auth.currentUser;
+    if (user != null) {
+      await consommerInvitationPersonnel(token: token, user: user);
     }
-
-    UserCredential cred;
-    if (_auth.currentUser != null) {
-      cred = UserCredentialMock(_auth.currentUser!);
-    } else {
-      cred = await _auth.createUserWithEmailAndPassword(
-        email: inv.emailDirecteur,
-        password: motDePasse,
-      );
-    }
-
-    final user = cred.user!;
-
-    final directeur = UtilisateurEduTrack(
-      id: user.uid,
-      email: inv.emailDirecteur,
-      role: RoleUtilisateur.directeur,
-      schoolId: inv.ecoleId,
-      profil: ProfilUtilisateur(
-        prenom: prenom,
-        nom: nom,
-        photoProfil: user.photoURL ?? '',
-      ),
-      estActif: true,
-      createdAt: DateTime.now(),
-    );
-
-    await sauvegarderUtilisateur(directeur);
-
-    await _db.collection('ecoles_rdc').doc(inv.ecoleId).set({
-      'directeurId': user.uid,
-      'directeurNom': '$prenom $nom',
-    }, SetOptions(merge: true));
-
-    await _db.collection('invitations_directeurs').doc(inv.id).update({
-      'estUtilise': true,
-      'utiliseLe': FieldValue.serverTimestamp(),
-    });
   }
 
   // ══════════════════════════════════════════════════

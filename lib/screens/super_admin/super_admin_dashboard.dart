@@ -575,9 +575,25 @@ class _CarteEcole extends StatelessWidget {
                   ),
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => _afficherDialogueGenererLien(context, ecole),
-                  icon: const Icon(Icons.vpn_key_outlined, size: 14),
-                  label: const Text('Lien unique', style: TextStyle(fontSize: 12)),
+                  onPressed: () => _afficherDialogueGenererLien(context, ecole, typeRole: 'directeur'),
+                  icon: const Icon(Icons.admin_panel_settings_outlined, size: 14),
+                  label: const Text('Directeur', style: TextStyle(fontSize: 11)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    side: const BorderSide(color: Color(0xFF2563EB)),
+                    foregroundColor: const Color(0xFF2563EB),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: () => _afficherDialogueGenererLien(context, ecole, typeRole: 'enseignant'),
+                  icon: const Icon(Icons.record_voice_over_outlined, size: 14),
+                  label: const Text('Enseignant', style: TextStyle(fontSize: 11)),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    side: const BorderSide(color: Color(0xFF0D9488)),
+                    foregroundColor: const Color(0xFF0D9488),
+                  ),
                 ),
               ],
             ),
@@ -587,10 +603,10 @@ class _CarteEcole extends StatelessWidget {
     );
   }
 
-  void _afficherDialogueGenererLien(BuildContext context, EcoleRDC ecole) {
+  void _afficherDialogueGenererLien(BuildContext context, EcoleRDC ecole, {required String typeRole}) {
     showDialog(
       context: context,
-      builder: (_) => _DialogueGenererLienInvitation(ecole: ecole),
+      builder: (_) => _DialogueGenererLienInvitation(ecole: ecole, typeRole: typeRole),
     );
   }
 }
@@ -1023,8 +1039,9 @@ class _GestionUtilisateurs extends StatelessWidget {
 // ════════════════════════════════════════════
 class _DialogueGenererLienInvitation extends StatefulWidget {
   final EcoleRDC ecole;
+  final String typeRole; // 'directeur' ou 'enseignant'
 
-  const _DialogueGenererLienInvitation({required this.ecole});
+  const _DialogueGenererLienInvitation({required this.ecole, required this.typeRole});
 
   @override
   State<_DialogueGenererLienInvitation> createState() => _DialogueGenererLienInvitationState();
@@ -1036,6 +1053,8 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
 
   String? _lienGenere;
   bool _chargement = false;
+
+  bool get _estEnseignant => widget.typeRole == 'enseignant';
 
   @override
   void dispose() {
@@ -1054,18 +1073,30 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
 
     setState(() => _chargement = true);
     try {
-      final url = await _service.genererLienInvitationDirecteur(
-        ecoleId: widget.ecole.id,
-        ecoleNom: widget.ecole.nom,
-        emailDirecteur: email,
-      );
+      final String url;
+      if (_estEnseignant) {
+        url = await _service.genererLienInvitationEnseignant(
+          ecoleId: widget.ecole.id,
+          ecoleNom: widget.ecole.nom,
+          emailEnseignant: email,
+        );
+      } else {
+        url = await _service.genererLienInvitationDirecteur(
+          ecoleId: widget.ecole.id,
+          ecoleNom: widget.ecole.nom,
+          emailDirecteur: email,
+        );
+      }
       if (mounted) {
         setState(() => _lienGenere = url);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+          const SnackBar(
+            content: Text('Une erreur s\'est produite. Réessaie.'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -1075,9 +1106,23 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
 
   @override
   Widget build(BuildContext context) {
+    final label = _estEnseignant ? 'Enseignant' : 'Directeur / Préfet';
+    final color = _estEnseignant ? const Color(0xFF0D9488) : const Color(0xFF2563EB);
+    final icon = _estEnseignant ? Icons.record_voice_over : Icons.admin_panel_settings;
+
     return AlertDialog(
-      title: Text('Invitation du Directeur / Préfet\n${widget.ecole.nom}',
-          style: const TextStyle(fontSize: 16)),
+      title: Row(
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Inviter un $label\n${widget.ecole.nom}',
+              style: const TextStyle(fontSize: 15),
+            ),
+          ),
+        ],
+      ),
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
@@ -1085,18 +1130,18 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (_lienGenere == null) ...[
-              const Text(
-                'Entrez l\'adresse email du futur Directeur. Un lien d\'activation crypté à usage unique sera généré.',
-                style: TextStyle(fontSize: 13),
+              Text(
+                'Entre l\'adresse email du futur $label. Un lien unique sera généré — il disparaît dès qu\'il est utilisé.',
+                style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 14),
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email du Directeur / Préfet *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email_outlined),
+                decoration: InputDecoration(
+                  labelText: 'Email du $label *',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
               ),
             ] else ...[
@@ -1113,7 +1158,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Lien unique d\'invitation généré ! Ce lien expirera dès sa première utilisation.',
+                        'Lien généré ! Copie-le et envoie-le. Il disparaît dès la première connexion.',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
                       ),
                     ),
@@ -1123,7 +1168,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
               const SizedBox(height: 14),
               SelectableText(
                 _lienGenere!,
-                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+                style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: color),
               ),
             ],
           ],
@@ -1141,6 +1186,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.vpn_key),
             label: const Text('Générer le lien'),
+            style: FilledButton.styleFrom(backgroundColor: color),
           ),
       ],
     );
