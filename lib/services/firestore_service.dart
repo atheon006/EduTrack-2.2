@@ -427,6 +427,48 @@ class FirestoreServiceRDC {
     await _db.collection('ecoles_rdc').doc(ecoleId).delete();
   }
 
+  Future<void> modifierEcole(String ecoleId, Map<String, dynamic> data) async {
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    await _db.collection('ecoles_rdc').doc(ecoleId).update(data);
+  }
+
+  Future<void> toggleEcoleActiveStatus(String ecoleId, bool estActive) async {
+    await _db.collection('ecoles_rdc').doc(ecoleId).update({
+      'estActive': estActive,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Stream<List<UtilisateurEduTrack>> streamTousLesUtilisateurs() {
+    return _db.collection('utilisateurs').snapshots().map((snap) =>
+        snap.docs.map((doc) => UtilisateurEduTrack.fromMap(doc.data(), doc.id)).toList());
+  }
+
+  Future<void> envoyerNotificationGlobale({
+    required String titre,
+    required String message,
+  }) async {
+    await _db.collection('notifications').add({
+      'titre': titre,
+      'message': message,
+      'date': FieldValue.serverTimestamp(),
+      'type': 'systeme',
+      'statut': 'non_lu',
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> streamNotificationsGlobales() {
+    return _db
+        .collection('notifications')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
   // ══════════════════════════════════════════════════
   // STATISTIQUES GLOBALES SUPER ADMIN
   // ══════════════════════════════════════════════════

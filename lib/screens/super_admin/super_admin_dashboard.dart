@@ -126,8 +126,8 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-            tooltip: 'Notifications',
+            onPressed: () => _afficherDialogNotifications(context),
+            tooltip: 'Notifications & Diffusion',
           ),
           PopupMenuButton<String>(
             icon: CircleAvatar(
@@ -426,6 +426,7 @@ class _GestionEcoles extends StatelessWidget {
               final ecole = ecoles[index];
               return _CarteEcole(
                 ecole: ecole,
+                service: service,
                 onNommerDirecteur: () =>
                     _afficherDialogueNommerDirecteur(context, ecole),
               );
@@ -464,9 +465,51 @@ class _GestionEcoles extends StatelessWidget {
 
 class _CarteEcole extends StatelessWidget {
   final EcoleRDC ecole;
+  final FirestoreServiceRDC service;
   final VoidCallback onNommerDirecteur;
 
-  const _CarteEcole({required this.ecole, required this.onNommerDirecteur});
+  const _CarteEcole({
+    required this.ecole,
+    required this.service,
+    required this.onNommerDirecteur,
+  });
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Supprimer l\'école'),
+        content: Text('Es-tu sûr de vouloir supprimer définitivement "${ecole.nom}" ? Cette action est irréversible.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await service.supprimerEcole(ecole.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('École "${ecole.nom}" supprimée avec succès.')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -515,23 +558,59 @@ class _CarteEcole extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ecole.estActive
-                        ? Colors.green.withValues(alpha: 0.15)
-                        : Colors.red.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    ecole.estActive ? 'Active' : 'Inactive',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: ecole.estActive ? Colors.green[700] : Colors.red[700],
+                GestureDetector(
+                  onTap: () async {
+                    await service.toggleEcoleActiveStatus(ecole.id, !ecole.estActive);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: ecole.estActive
+                          ? Colors.green.withValues(alpha: 0.15)
+                          : Colors.red.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      ecole.estActive ? 'Active' : 'Inactive',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: ecole.estActive ? Colors.green[700] : Colors.red[700],
+                      ),
                     ),
                   ),
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert_rounded, size: 20),
+                  onSelected: (val) async {
+                    if (val == 'supprimer') {
+                      _confirmDelete(context);
+                    } else if (val == 'toggle') {
+                      await service.toggleEcoleActiveStatus(ecole.id, !ecole.estActive);
+                    }
+                  },
+                  itemBuilder: (ctx) => [
+                    PopupMenuItem(
+                      value: 'toggle',
+                      child: Row(
+                        children: [
+                          Icon(ecole.estActive ? Icons.pause_circle_outline : Icons.play_circle_outline, size: 18),
+                          const SizedBox(width: 8),
+                          Text(ecole.estActive ? 'Désactiver l\'école' : 'Activer l\'école'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'supprimer',
+                      child: const Row(
+                        children: [
+                          Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                          SizedBox(width: 8),
+                          Text('Supprimer l\'école', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -997,41 +1076,287 @@ class _DialogueNommerDirecteurState extends State<_DialogueNommerDirecteur> {
 }
 
 // ════════════════════════════════════════════
-// GESTION UTILISATEURS (placeholder)
+// GESTION UTILISATEURS (Complet & Temps Réel)
 // ════════════════════════════════════════════
-class _GestionUtilisateurs extends StatelessWidget {
+class _GestionUtilisateurs extends StatefulWidget {
   final FirestoreServiceRDC service;
 
   const _GestionUtilisateurs({required this.service});
 
   @override
+  State<_GestionUtilisateurs> createState() => _GestionUtilisateursState();
+}
+
+class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
+  final _searchController = TextEditingController();
+  String _filtreRole = 'tous';
+  String _recherche = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.people_outline,
-              size: 80,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
-          const SizedBox(height: 16),
-          Text(
-            'Gestion des utilisateurs',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
+
+    return Column(
+      children: [
+        // Barre de recherche & Filtre
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _searchController,
+                onChanged: (val) => setState(() => _recherche = val.trim().toLowerCase()),
+                decoration: InputDecoration(
+                  hintText: 'Rechercher par nom ou email...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildChipFilter('tous', 'Tous'),
+                    const SizedBox(width: 8),
+                    _buildChipFilter('superAdmin', 'Super Admin'),
+                    const SizedBox(width: 8),
+                    _buildChipFilter('directeur', 'Directeurs'),
+                    const SizedBox(width: 8),
+                    _buildChipFilter('enseignant', 'Enseignants'),
+                    const SizedBox(width: 8),
+                    _buildChipFilter('parent', 'Parents'),
+                    const SizedBox(width: 8),
+                    _buildChipFilter('eleve', 'Élèves'),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Disponible prochainement',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-            ),
+        ),
+
+        // Liste des utilisateurs
+        Expanded(
+          child: StreamBuilder<List<UtilisateurEduTrack>>(
+            stream: widget.service.streamTousLesUtilisateurs(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Erreur: ${snapshot.error}'));
+              }
+              final users = snapshot.data ?? [];
+
+              final filtres = users.where((u) {
+                final matchSearch = _recherche.isEmpty ||
+                    u.email.toLowerCase().contains(_recherche) ||
+                    u.profil.nomComplet.toLowerCase().contains(_recherche);
+                final matchRole = _filtreRole == 'tous' || u.role.name == _filtreRole;
+                return matchSearch && matchRole;
+              }).toList();
+
+              if (filtres.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person_search_rounded, size: 64, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+                      const SizedBox(height: 12),
+                      Text('Aucun utilisateur trouvé', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: filtres.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final user = filtres[index];
+                  return Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.15)),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: _getColorForRole(user.role.name).withValues(alpha: 0.15),
+                        child: Text(
+                          user.profil.nomComplet.isNotEmpty ? user.profil.nomComplet[0].toUpperCase() : 'U',
+                          style: TextStyle(color: _getColorForRole(user.role.name), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      title: Text(user.profil.nomComplet.isNotEmpty ? user.profil.nomComplet : user.email,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      subtitle: Text(user.email, style: const TextStyle(fontSize: 12)),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _getColorForRole(user.role.name).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          _getRoleLabel(user.role.name),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: _getColorForRole(user.role.name),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
+
+  Widget _buildChipFilter(String value, String label) {
+    final estSelectionne = _filtreRole == value;
+    return ChoiceChip(
+      label: Text(label, style: TextStyle(fontSize: 12, color: estSelectionne ? Colors.white : null)),
+      selected: estSelectionne,
+      selectedColor: Theme.of(context).colorScheme.primary,
+      onSelected: (_) => setState(() => _filtreRole = value),
+    );
+  }
+
+  Color _getColorForRole(String role) {
+    switch (role) {
+      case 'superAdmin':
+      case 'super_admin':
+        return Colors.indigo;
+      case 'directeur':
+        return Colors.blue;
+      case 'enseignant':
+        return Colors.teal;
+      case 'parent':
+        return Colors.purple;
+      case 'eleve':
+      case 'student':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String _getRoleLabel(String role) {
+    switch (role) {
+      case 'superAdmin':
+      case 'super_admin':
+        return 'Super Admin';
+      case 'directeur':
+        return 'Directeur';
+      case 'enseignant':
+        return 'Enseignant';
+      case 'parent':
+        return 'Parent';
+      case 'eleve':
+      case 'student':
+        return 'Élève';
+      default:
+        return role;
+    }
+  }
+}
+
+/// Dialogue des Notifications Système & Diffusion Globale
+void _afficherDialogNotifications(BuildContext context) {
+  final service = FirestoreServiceRDC();
+  final titreController = TextEditingController();
+  final messageController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.campaign_rounded, color: Colors.blue),
+          SizedBox(width: 8),
+          Text('Diffusion & Notifications', style: TextStyle(fontSize: 16)),
+        ],
+      ),
+      content: SizedBox(
+        width: 480,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Envoie une notification globale à tous les réseaux d\'écoles de l\'application.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: titreController,
+              decoration: const InputDecoration(
+                labelText: 'Titre du message *',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: messageController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Contenu du message *',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Fermer'),
+        ),
+        FilledButton.icon(
+          icon: const Icon(Icons.send_rounded, size: 16),
+          label: const Text('Diffuser'),
+          onPressed: () async {
+            final titre = titreController.text.trim();
+            final msg = messageController.text.trim();
+            if (titre.isEmpty || msg.isEmpty) return;
+
+            Navigator.pop(ctx);
+            try {
+              await service.envoyerNotificationGlobale(titre: titre, message: msg);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Notification diffusée avec succès à tout le réseau !'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                );
+              }
+            }
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 // ════════════════════════════════════════════
