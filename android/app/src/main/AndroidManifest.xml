@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     
     <application
-        android:label="PixelGrad"
+        android:label="EduTrack"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

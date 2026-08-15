@@ -25,46 +25,58 @@ bool _isAppInitialized = false;
 final ThemeNotifier themeNotifier = ThemeNotifier();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with options
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    if (kDebugMode) {
-      print('⚠️ Firebase initialization info: $e');
-    }
-  }
+    FlutterError.onError = (FlutterErrorDetails details) {
+      if (kDebugMode) {
+        FlutterError.dumpErrorToConsole(details);
+      }
+    };
 
-  // Initialize FCM Service
-  try {
-    final fcmService = FCMService();
-    await fcmService.initialize();
-    if (kDebugMode) {
-      print('🔔 FCM Service initialized successfully');
+    // Initialize Firebase with options
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ Firebase initialization info: $e');
+      }
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('⚠️ Error initializing FCM Service: $e');
-    }
-  }
 
-  try {
-    if (!_isAppInitialized) {
-      _isAppInitialized = true;
-      await StorageUtil.setString('app_initialized', DateTime.now().toString());
-    } else {
-      await StorageUtil.init();
+    // Initialize FCM Service
+    try {
+      final fcmService = FCMService();
+      await fcmService.initialize();
+      if (kDebugMode) {
+        print('🔔 FCM Service initialized successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ Error initializing FCM Service: $e');
+      }
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('⚠️ Error initializing storage: $e');
-    }
-  }
 
-  runApp(const MyApp());
+    try {
+      if (!_isAppInitialized) {
+        _isAppInitialized = true;
+        await StorageUtil.setString('app_initialized', DateTime.now().toString());
+      } else {
+        await StorageUtil.init();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ Error initializing storage: $e');
+      }
+    }
+
+    runApp(const MyApp());
+  }, (error, stack) {
+    if (kDebugMode) {
+      print('⚠️ Top-level app error caught: $error');
+    }
+  });
 }
 
 class MyApp extends StatefulWidget {
