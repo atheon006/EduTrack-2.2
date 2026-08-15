@@ -34,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyse statique du code
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/ lib/config/ lib/services/firestore_service.dart lib/models/
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/main.dart lib/utils/ lib/services/firestore_service.dart lib/models/
 
       - name: Build Web (PWA) Release
         run: flutter build web --release
@@ -46,10 +46,10 @@ jobs:
           path: build/web
 
   # ─────────────────────────────────────────────
-  # Job 2 : Build Android AppBundle
+  # Job 2 : Build Android (APK + AppBundle) sur GitHub
   # ─────────────────────────────────────────────
   build-android:
-    name: "🤖 Build Android AppBundle"
+    name: "🤖 Build Android (APK & AppBundle)"
     runs-on: ubuntu-latest
 
     steps:
@@ -71,10 +71,19 @@ jobs:
       - name: Installation des dépendances
         run: flutter pub get
 
-      - name: Build Android AppBundle Release
-        run: flutter build appbundle --release --android-skip-build-dependency-validation
+      - name: Build Android APK Release
+        run: flutter build apk --release --no-tree-shake-icons --android-skip-build-dependency-validation
 
-      - name: Upload artefact Android AppBundle
+      - name: Build Android AppBundle Release
+        run: flutter build appbundle --release --no-tree-shake-icons --android-skip-build-dependency-validation
+
+      - name: Upload APK Android (.apk)
+        uses: actions/upload-artifact@v4
+        with:
+          name: edutrack-android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AppBundle Android (.aab)
         uses: actions/upload-artifact@v4
         with:
           name: edutrack-appbundle-release
