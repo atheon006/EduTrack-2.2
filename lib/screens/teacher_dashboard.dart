@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school_app/screens/role_selection_screen.dart';
+import 'package:edutrack/screens/role_selection_screen.dart';
 import '../models/user_model.dart';
 import '../utils/app_theme.dart';
 import '../services/schedule_service.dart';

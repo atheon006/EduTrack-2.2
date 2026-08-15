@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'; 
 import 'package:image_picker/image_picker.dart';
-import 'package:school_app/screens/role_selection_screen.dart';
+import 'package:edutrack/screens/role_selection_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart'; 
 import '../models/user_model.dart';
 import '../models/school_model.dart';
