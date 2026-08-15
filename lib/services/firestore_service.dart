@@ -35,7 +35,7 @@ class FirestoreServiceRDC {
     // Verrouillage Super Admin
     if (roleSouhaite == 'super_admin' || roleSouhaite == 'superAdmin') {
       if (emailClean != kSuperAdminEmail.toLowerCase()) {
-        throw Exception('Accès refusé : Seul l\'administrateur principal (readykalonda38@gmail.com) peut se connecter comme Super Administrateur.');
+        throw Exception('Accès refusé : Seul l\'administrateur principal autorisé peut se connecter comme Super Administrateur.');
       }
     }
 
@@ -43,6 +43,62 @@ class FirestoreServiceRDC {
       email: emailClean,
       password: motDePasse.trim(),
     );
+  }
+
+  /// Connexion avec Google Auth (Seule méthode d'authentification recommandée)
+  /// Reconnaît automatiquement l'adresse du Super Admin principal
+  Future<UserCredential> connnecterAvecGoogle({String? roleSouhaite}) async {
+    final googleProvider = GoogleAuthProvider();
+    googleProvider.addScope('email');
+    googleProvider.addScope('profile');
+
+    UserCredential userCredential;
+    try {
+      userCredential = await _auth.signInWithPopup(googleProvider);
+    } catch (e) {
+      userCredential = await _auth.signInWithProvider(googleProvider);
+    }
+
+    final user = userCredential.user;
+    if (user != null) {
+      final emailClean = user.email?.toLowerCase().trim() ?? '';
+
+      // Auto-reconnaissance du Super Admin
+      if (emailClean == kSuperAdminEmail.toLowerCase()) {
+        final displayName = user.displayName ?? 'Super Admin';
+        final utilisateurAdmin = UtilisateurEduTrack(
+          id: user.uid,
+          email: emailClean,
+          role: RoleUtilisateur.superAdmin,
+          profil: ProfilUtilisateur(
+            prenom: displayName.split(' ').first,
+            nom: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : 'Admin',
+          ),
+          estActif: true,
+          createdAt: DateTime.now(),
+        );
+        await sauvegarderUtilisateur(utilisateurAdmin);
+      } else {
+        // Pour les autres utilisateurs
+        final doc = await _db.collection('utilisateurs').doc(user.uid).get();
+        if (!doc.exists) {
+          final displayName = user.displayName ?? emailClean.split('@').first;
+          final nouveau = UtilisateurEduTrack(
+            id: user.uid,
+            email: emailClean,
+            role: RoleUtilisateur.parent,
+            profil: ProfilUtilisateur(
+              prenom: displayName.split(' ').first,
+              nom: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : '',
+            ),
+            estActif: true,
+            createdAt: DateTime.now(),
+          );
+          await sauvegarderUtilisateur(nouveau);
+        }
+      }
+    }
+    return userCredential;
   }
 
   Future<void> seDeconnecter() async {

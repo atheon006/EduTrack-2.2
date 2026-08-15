@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../models/utilisateur_model.dart';
+import '../services/firestore_service.dart';
 import '../utils/storage_util.dart';
-import '../services/fcm_service.dart';
-import '../services/api_service.dart';
 import 'student_dashboard.dart';
 import 'teacher_dashboard.dart';
 import 'parent_dashboard.dart';
 import 'school_admin_dashboard.dart';
 import 'super_admin/super_admin_dashboard.dart';
-import '../services/student_service.dart';
-import '../utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? selectedRole;
@@ -27,38 +22,22 @@ class LoginScreen extends StatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  bool _showLoginForm = false;
+  final FirestoreServiceRDC _firestoreService = FirestoreServiceRDC();
   String _selectedRole = '';
   bool _isLoading = false;
-  bool _obscurePassword = true;
-
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
     if (widget.selectedRole != null) {
       _selectedRole = widget.selectedRole!;
-      _showLoginForm = true;
     }
   }
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  // Helper methods for role-related information
   String _getRoleName(String role) {
     switch (role) {
       case 'super_admin':
@@ -83,31 +62,43 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Color _getRoleColor(String role) {
     switch (role) {
+      case 'super_admin':
+      case 'superAdmin':
+        return const Color(0xFF4F46E5);
+      case 'directeur':
       case 'school_admin':
-        return Colors.blue;
+        return const Color(0xFF2563EB);
       case 'teacher':
-        return Colors.green;
+      case 'enseignant':
+        return const Color(0xFF0D9488);
       case 'student':
-        return Colors.orange;
+      case 'eleve':
+        return const Color(0xFFD97706);
       case 'parent':
-        return Colors.purple;
+        return const Color(0xFF7C3AED);
       default:
-        return Colors.grey;
+        return const Color(0xFF3B82F6);
     }
   }
 
   IconData _getRoleIcon(String role) {
     switch (role) {
+      case 'super_admin':
+      case 'superAdmin':
+        return Icons.security_rounded;
+      case 'directeur':
       case 'school_admin':
-        return Icons.admin_panel_settings;
+        return Icons.admin_panel_settings_rounded;
       case 'teacher':
-        return Icons.school;
+      case 'enseignant':
+        return Icons.record_voice_over_rounded;
       case 'student':
-        return Icons.person;
+      case 'eleve':
+        return Icons.menu_book_rounded;
       case 'parent':
-        return Icons.family_restroom;
+        return Icons.family_restroom_rounded;
       default:
-        return Icons.person;
+        return Icons.person_rounded;
     }
   }
 
@@ -130,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-              builder: (context) => SuperAdminDashboard(superAdmin: superAdmin)),
+            builder: (context) => SuperAdminDashboard(superAdmin: superAdmin),
+          ),
           (route) => false,
         );
         break;
@@ -139,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-              builder: (context) => SchoolAdminDashboard(user: user)),
+            builder: (context) => SchoolAdminDashboard(user: user),
+          ),
           (route) => false,
         );
         break;
@@ -147,7 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'enseignant':
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => TeacherDashboard(user: user)),
+          MaterialPageRoute(
+            builder: (context) => TeacherDashboard(user: user),
+          ),
           (route) => false,
         );
         break;
@@ -155,750 +150,237 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'eleve':
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => StudentDashboard(user: user)),
+          MaterialPageRoute(
+            builder: (context) => StudentDashboard(user: user),
+          ),
           (route) => false,
         );
         break;
       case 'parent':
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => ParentDashboard(user: user)),
+          MaterialPageRoute(
+            builder: (context) => ParentDashboard(user: user),
+          ),
           (route) => false,
         );
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tableau de bord non implémenté pour le rôle $role')),
+          SnackBar(content: Text('Rôle inconnu: $role')),
         );
     }
   }
 
-  void _loginAsDemoUser(String role) async {
-    final demoName = role == 'super_admin'
-        ? 'Super Admin EduTrack'
-        : role == 'directeur'
-            ? 'Préfet Mukendi'
-            : role == 'teacher'
-                ? 'Prof. Mwamba'
-                : role == 'student'
-                    ? 'Kabila Jean'
-                    : 'Mme Ilunga';
+  /// Connexion directe via Google Auth
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
 
-    final user = User(
-      id: 'demo_${role}_123',
-      email: '$role@edutrack-rdc.cd',
-      role: role,
-      schoolToken: 'DEMO_TOKEN',
-      schoolName: 'Complexe Scolaire La Sagesse (Kinshasa)',
-      profile: UserProfile(
-        firstName: demoName.split(' ')[0],
-        lastName: demoName.split(' ').length > 1 ? demoName.split(' ')[1] : '',
-        phone: '+243 812 345 678',
-        address: 'Kinshasa, RDC',
-        profilePicture: '',
-      ),
-    );
+    try {
+      final userCredential = await _firestoreService.connnecterAvecGoogle(
+        roleSouhaite: _selectedRole,
+      );
+      final fbUser = userCredential.user;
 
-    await StorageUtil.setString('userId', user.id);
-    await StorageUtil.setString('userEmail', user.email);
-    await StorageUtil.setString('userRole', user.role);
-    await StorageUtil.setString('userFirstName', user.profile.firstName);
-    await StorageUtil.setString('userLastName', user.profile.lastName);
-    await StorageUtil.setBool('isLoggedIn', true);
+      if (fbUser != null && mounted) {
+        final emailClean = fbUser.email?.toLowerCase().trim() ?? '';
+        final displayName = fbUser.displayName ?? 'Utilisateur';
 
-    _navigateBasedOnRole(role, user);
-  }
+        // Auto-reconnaissance du Super Admin (readykalonda38@gmail.com)
+        if (emailClean == 'readykalonda38@gmail.com') {
+          await StorageUtil.setString('userRole', 'super_admin');
+          await StorageUtil.setBool('isLoggedIn', true);
 
-  void _handleLogin() async {
-    setState(() {
-      _isLoading = true;
-    });
+          final superAdmin = UtilisateurEduTrack(
+            id: fbUser.uid,
+            email: emailClean,
+            role: RoleUtilisateur.superAdmin,
+            profil: ProfilUtilisateur(
+              prenom: displayName.split(' ').first,
+              nom: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : 'Admin',
+            ),
+            createdAt: DateTime.now(),
+          );
 
-    if (_formKey.currentState!.validate()) {
-      String email = _emailController.text.trim();
-      String password = _passwordController.text;
+          if (!mounted) return;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SuperAdminDashboard(superAdmin: superAdmin),
+            ),
+            (route) => false,
+          );
+          return;
+        }
 
-      try {
-        final response = await http.post(
-          Uri.parse('https://nova-backend-tlzr.onrender.com/api/auth/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'email': email,
-            'password': password,
-          }),
+        // Pour les autres rôles (Directeur, Enseignant, Parent, Élève)
+        final docUtil = await _firestoreService.getUtilisateur(fbUser.uid);
+        final roleStr = docUtil?.role.name ?? (_selectedRole.isNotEmpty ? _selectedRole : 'parent');
+
+        await StorageUtil.setString('userRole', roleStr);
+        await StorageUtil.setBool('isLoggedIn', true);
+
+        final mockUser = User(
+          id: fbUser.uid,
+          email: emailClean,
+          role: roleStr,
+          schoolToken: widget.schoolToken,
+          schoolName: widget.schoolName,
+          profile: UserProfile(
+            firstName: displayName.split(' ').first,
+            lastName: displayName.split(' ').length > 1 ? displayName.split(' ').sublist(1).join(' ') : '',
+            phone: '',
+            address: '',
+            profilePicture: fbUser.photoURL ?? '',
+          ),
         );
 
-        print('🔵 /auth/login response: \\n${response.body}');
-        final responseData = json.decode(response.body);
-
-        if (response.statusCode == 200 && responseData['success'] == true) {
-          final userData = responseData['data']['user'];
-          final tokens = responseData['data']['tokens'];
-
-          // Store access token and refresh token for future requests
-          await StorageUtil.setString('accessToken', tokens['accessToken']);
-          await StorageUtil.setString('refreshToken', tokens['refreshToken']);
-          await StorageUtil.setString(
-              'schoolId', userData['schoolId']?.toString() ?? '');
-
-          // Extract schoolId from user data
-          String schoolId = userData['schoolId']?.toString() ?? '';
-          print('🏫 Extracted schoolId from user: $schoolId');
-
-          // Try to fetch school data using the correct API endpoint
-          String schoolName = 'Unknown School';
-          String schoolToken = '';
-          String schoolAddress = '';
-          String schoolPhone = '';
-
-          if (schoolId.isNotEmpty) {
-            try {
-              print('🔍 Fetching school data for ID: $schoolId');
-              final schoolResponse = await http.get(
-                Uri.parse(
-                    'https://nova-backend-tlzr.onrender.com/api/schools?schoolId=$schoolId'),
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'Bearer ${tokens['accessToken']}',
-                },
-              );
-
-              print(
-                  '🏫 School API Response Status: ${schoolResponse.statusCode}');
-              print('🏫 School API Response Body: ${schoolResponse.body}');
-
-              if (schoolResponse.statusCode == 200) {
-                final schoolResponseData = json.decode(schoolResponse.body);
-
-                if (schoolResponseData['success'] == true &&
-                    schoolResponseData['data'] != null &&
-                    schoolResponseData['data']['school'] != null &&
-                    schoolResponseData['data']['school'].isNotEmpty) {
-                  // Extract school data from the school object
-                  final fetchedSchoolData =
-                      schoolResponseData['data']['school'];
-
-                  // Map the response fields to our storage
-                  schoolToken = fetchedSchoolData['secretKey'] ?? '';
-                  schoolName = fetchedSchoolData['name'] ?? 'Unknown School';
-                  schoolAddress = fetchedSchoolData['address'] ?? '';
-                  schoolPhone = fetchedSchoolData['phone'] ?? '';
-
-                  // Store additional school data that might be useful
-                  await StorageUtil.setString(
-                      'schoolEmail', fetchedSchoolData['email'] ?? '');
-                  await StorageUtil.setString(
-                      'schoolSecretKey', fetchedSchoolData['secretKey'] ?? '');
-                  await StorageUtil.setString('schoolTeachers',
-                      json.encode(fetchedSchoolData['teachers'] ?? []));
-                  await StorageUtil.setString('schoolStudents',
-                      json.encode(fetchedSchoolData['students'] ?? []));
-                  await StorageUtil.setString('schoolClasses',
-                      json.encode(fetchedSchoolData['classes'] ?? []));
-                  await StorageUtil.setString('schoolParents',
-                      json.encode(fetchedSchoolData['parents'] ?? []));
-                  await StorageUtil.setString('schoolAdmins',
-                      json.encode(fetchedSchoolData['admins'] ?? []));
-                } else {
-                  print(
-                      '⚠️ School data response format unexpected or empty: $schoolResponseData');
-                }
-              } else {
-                print(
-                    '⚠️ Failed to fetch school data. Status: ${schoolResponse.statusCode}');
-                print('⚠️ Response: ${schoolResponse.body}');
-              }
-            } catch (e) {
-              print('⚠️ Error fetching school data: $e');
-            }
-          }
-
-          await StorageUtil.setString('schoolName', schoolName);
-          await StorageUtil.setString('schoolAddress', schoolAddress);
-          await StorageUtil.setString('schoolPhone', schoolPhone);
-
-          bool roleMatches = userData['role'] == _selectedRole;
-
-          if (!roleMatches) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Access denied: The role does not match your account type'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          } else {
-            // Create user object with school data
-            final user = User(
-              id: userData['id'],
-              email: userData['email'],
-              role: userData['role'],
-              schoolToken: schoolToken,
-              schoolName: schoolName,
-              profile: UserProfile(
-                firstName: userData['name']?.split(' ')[0] ?? 'User',
-                lastName: userData['name']?.split(' ').length > 1
-                    ? userData['name'].split(' ')[1]
-                    : '',
-                phone: '123-456-7890',
-                address: '123 School St',
-                profilePicture:
-                    'https://randomuser.me/api/portraits/${userData['role'] == 'teacher' ? 'men' : userData['role'] == 'student' ? 'lego' : userData['role'] == 'parent' ? 'women' : 'men'}/1.jpg',
-              ),
-            );
-
-            // Store user information in persistent storage
-            await StorageUtil.setString('userId', user.id);
-            await StorageUtil.setString('userEmail', user.email);
-            await StorageUtil.setString('userRole', user.role);
-            await StorageUtil.setString(
-                'userFirstName', user.profile.firstName);
-            await StorageUtil.setString('userLastName', user.profile.lastName);
-            await StorageUtil.setString('userPhone', user.profile.phone);
-            await StorageUtil.setString('userAddress', user.profile.address);
-            await StorageUtil.setString(
-                'userProfilePic', user.profile.profilePicture);
-
-            // Store theme preferences
-
-            // Flag to indicate user is logged in - THIS IS CRUCIAL
-            await StorageUtil.setBool('isLoggedIn', true);
-
-            // Verify storage was successful
-            final verifyLogin = await StorageUtil.getBool('isLoggedIn');
-            print('✅ Login status stored and verified: $verifyLogin');
-
-            // For student role, fetch class ID before proceeding
-            String? classId;            if (user.role == 'student') {
-              // Use classId from login response if available
-              if (userData.containsKey('classId') && userData['classId'] != null && userData['classId'].toString().isNotEmpty) {
-                if (userData['classId'] is Map<String, dynamic>) {
-                  classId = userData['classId'];
-                } else {
-                  classId = userData['classId'].toString();
-                }
-                await StorageUtil.setString('userClassId', classId!);
-                print('📚 Student class ID stored from login response: $classId');
-              } else {
-                print('⚠️ No classId found for student in login response');
-              }
-            }
-
-            // Generate FCM token and subscribe to school topic
-            try {
-              final fcmService = FCMService();
-
-              await fcmService.initialize();
-              final fcmToken = fcmService.fcmToken;
-              print('🔔 FCM Token generated: $fcmToken');
-
-              if (schoolId.isNotEmpty) {
-                await fcmService.subscribeToSchoolTopic(schoolId);
-                print('🔔 Subscribed to school topic: school_$schoolId');                await fcmService.storeFCMDataForUser(
-                  userId: user.id,
-                  schoolId: schoolId,
-                  userRole: user.role,
-                  classId: classId, // Pass the classId parameter explicitly
-                );
-                print('🔔 FCM data stored for user: ${user.id} with classId: $classId');
-
-                if (fcmToken != null) {
-                  await _registerFcmTokenWithServer(
-                    token: fcmToken,
-                    schoolId: schoolId,
-                    userId: user.id,
-                    role: user.role,
-                    classId: classId,
-                  );
-                }
-              }
-            } catch (e) {
-              print('⚠️ Error setting up FCM: $e');
-            }
-
-            // 🔥 FINAL VERIFICATION - LOG ALL STORED VALUES
-            print('🔍 FINAL VERIFICATION - ALL STORED VALUES:');
-            final finalSchoolName = await StorageUtil.getString('schoolName');
-            final finalSchoolId = await StorageUtil.getString('schoolId');
-            final finalSchoolAddress =
-                await StorageUtil.getString('schoolAddress');
-            final finalSchoolPhone = await StorageUtil.getString('schoolPhone');
-            final finalSchoolEmail = await StorageUtil.getString('schoolEmail');
-            final finalSchoolSecretKey =
-                await StorageUtil.getString('schoolSecretKey');
-            final finalSchoolTeachers =
-                await StorageUtil.getString('schoolTeachers');
-            final finalSchoolStudents =
-                await StorageUtil.getString('schoolStudents');
-            final finalSchoolClasses =
-                await StorageUtil.getString('schoolClasses');
-            final finalSchoolParents =
-                await StorageUtil.getString('schoolParents');
-            final finalSchoolAdmins =
-                await StorageUtil.getString('schoolAdmins');
-            final finalUserId = await StorageUtil.getString('userId');
-            final finalUserEmail = await StorageUtil.getString('userEmail');
-            final finalUserRole = await StorageUtil.getString('userRole');
-            final finalIsLoggedIn = await StorageUtil.getBool('isLoggedIn');
-
-            print('✅ Final schoolName: $finalSchoolName');
-            print('✅ Final schoolId: $finalSchoolId');
-            print('✅ Final schoolAddress: $finalSchoolAddress');
-            print('✅ Final schoolPhone: $finalSchoolPhone');
-            print('✅ Final schoolEmail: $finalSchoolEmail');
-            print('✅ Final schoolSecretKey: $finalSchoolSecretKey');
-            print('✅ Final schoolTeachers: $finalSchoolTeachers');
-            print('✅ Final schoolStudents: $finalSchoolStudents');
-            print('✅ Final schoolClasses: $finalSchoolClasses');
-            print('✅ Final schoolParents: $finalSchoolParents');
-            print('✅ Final schoolAdmins: $finalSchoolAdmins');
-            print('✅ Final userId: $finalUserId');
-            print('✅ Final userEmail: $finalUserEmail');
-            print('✅ Final userRole: $finalUserRole');
-            print('✅ Final isLoggedIn: $finalIsLoggedIn');
-
-            // Navigate based on role
-            _navigateBasedOnRole(userData['role'], user);
-          }
-        } else {
-          String errorMessage = responseData['message'] ?? 'Login failed';
-
-          if (response.statusCode == 401) {
-            errorMessage = 'Invalid email or password';
-          } else if (response.statusCode == 403) {
-            errorMessage = 'Your account is not authorized for this school';
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
-        print('❌ Login error: $e');
+        if (!mounted) return;
+        _navigateBasedOnRole(roleStr, mockUser);
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${e.toString()}'),
+            content: Text('Erreur de connexion Google : $e'),
             backgroundColor: Colors.red,
           ),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-  // Update to include classId parameter
-  Future<void> _registerFcmTokenWithServer({
-    required String token,
-    required String schoolId,
-    required String userId,
-    required String role,
-    String? classId, // Add classId parameter
-  }) async {
-    try {
-      // Create request body with all parameters
-      final Map<String, dynamic> requestBody = {
-        "token": token,
-        "userId": userId,
-        "schoolId": schoolId,
-        "topic": "school_$schoolId",
-        "deviceType": Theme.of(context).platform == TargetPlatform.iOS
-            ? "ios"
-            : "android",
-        "role": role,
-      };
-
-      // Add classId to request body if it exists (for students)
-      if (classId != null && classId.toString().isNotEmpty) {
-        requestBody["classId"] = classId;
-        print('🔔 Including classId in FCM registration: $classId');
-      } else {
-        requestBody.remove("classId");
-      }
-
-      final response = await http.post(
-        Uri.parse('https://nova-backend-tlzr.onrender.com/api/fcm/token'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(requestBody),
-      );
-
-      if (response.statusCode == 200) {
-        print('🔔 FCM token registered with server successfully');
-      } else {
-        print('⚠️ Failed to register FCM token with server: ${response.body}');
-      }
-    } catch (e) {
-      print('⚠️ Error registering FCM token with server: $e');
-    }
-  }
-
-  // Add method to handle forgot password
-  void _showForgotPasswordDialog() {
-    final TextEditingController emailController = TextEditingController();
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    bool isLoading = false;
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Forgot Password'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Enter your email address and we\'ll send you a link to reset your password.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!value.contains('@') || !value.contains('.')) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
-                    ),
-                  )
-                : TextButton(
-                    onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        setState(() {
-                          isLoading = true;
-                        });
-
-                        try {
-                          final apiService = ApiService(Constants.apiBaseUrl);
-                          final response = await apiService
-                              .forgotPassword(emailController.text.trim());
-                          final responseData = json.decode(response.body);
-
-                          Navigator.pop(context); // Close the dialog
-
-                          if (response.statusCode == 200 &&
-                              responseData['success'] == true) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'Password reset link sent. Please check your email.'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          } else {
-                            String errorMessage = responseData['message'] ??
-                                'Failed to send reset link';
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(errorMessage),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          Navigator.pop(context); // Close dialog on error
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: ${e.toString()}'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: const Text('Submit'),
-                  ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _showLoginForm
-          ? AppBar(
-              backgroundColor: const Color.fromARGB(184, 92, 206, 228),
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  // Always go back to the previous screen (role selection)
-                  Navigator.pop(context);
-                },
-              ),
-              title: Text(widget.schoolName),
-            )
-          : null,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.blue.shade100,
-              Colors.white,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          Hero(
-                            tag: 'app_logo',
-                            child: Container(
-                              height: 100,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'images/logo.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            _showLoginForm
-                                ? '${_getRoleName(_selectedRole)} Login'
-                                : widget.schoolName,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _showLoginForm
-                                ? 'Sign in to continue'
-                                : 'Select your role to continue',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          if (_showLoginForm)
-                            _buildLoginForm()
-                          else
-                            _buildRoleSelection(),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoginForm() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final primaryTextColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
     final roleColor = _getRoleColor(_selectedRole);
-    final textColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
-    final inputBg = isDark ? const Color(0xFF1E293B) : Colors.white;
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Adresse Email *',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _emailController,
-            style: TextStyle(color: textColor, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: _selectedRole == 'super_admin' ? 'readykalonda38@gmail.com' : 'exemple@domaine.cd',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              prefixIcon: Icon(Icons.email_outlined, color: roleColor),
-              filled: true,
-              fillColor: inputBg,
-            ),
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Veuillez entrer votre email';
-              }
-              if (_selectedRole == 'super_admin' && value.trim().toLowerCase() != 'readykalonda38@gmail.com') {
-                return 'Accès refusé: Seul readykalonda38@gmail.com est autorisé';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Mot de passe *',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _passwordController,
-            style: TextStyle(color: textColor, fontSize: 15),
-            decoration: InputDecoration(
-              hintText: 'Votre mot de passe',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              prefixIcon: Icon(Icons.lock_outline, color: roleColor),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                  color: roleColor,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-              filled: true,
-              fillColor: inputBg,
-            ),
-            obscureText: _obscurePassword,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Veuillez entrer votre mot de passe';
-              }
-              return null;
-            },
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _showForgotPasswordDialog,
-              child: Text(
-                'Mot de passe oublié ?',
-                style: TextStyle(color: roleColor, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _handleLogin,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              backgroundColor: roleColor,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
-                  )
-                : const Text(
-                    'Se connecter',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-          ),
-        ],
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(
+          _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'Authentification Google',
+          style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: primaryTextColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
       ),
-    );
-  }
-
-  Widget _buildRoleSelection() {
-    final roles = ['school_admin', 'teacher', 'student', 'parent'];
-
-    return Column(
-      children: [
-        ...roles.map((role) => Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedRole = role;
-                    _showLoginForm = true;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  backgroundColor: _getRoleColor(role),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Card(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+                side: BorderSide(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(_getRoleIcon(role)),
-                    const SizedBox(width: 12),
+                    // Role Icon Emblem
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: roleColor.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _getRoleIcon(_selectedRole),
+                          size: 48,
+                          color: roleColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
                     Text(
-                      _getRoleName(role),
-                      style: const TextStyle(fontSize: 16),
+                      _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'Connexion EduTrack',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+
+                    Text(
+                      'Connectez-vous en un clic avec votre compte Google',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Google Sign-In Primary Button
+                    ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _handleGoogleSignIn,
+                      icon: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : const Icon(Icons.g_mobiledata_rounded, size: 34, color: Colors.white),
+                      label: Text(
+                        _isLoading ? 'Connexion en cours...' : 'Se connecter avec Google',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
+                        backgroundColor: roleColor,
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Security Footer Note
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.verified_user_rounded, size: 16, color: Colors.green),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Connexion sécurisée SSL / Firebase Auth',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-            )),
-      ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

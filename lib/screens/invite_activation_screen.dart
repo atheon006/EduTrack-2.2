@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/firestore_service.dart';
 import '../models/invitation_model.dart';
 
-/// Écran d'activation de compte Directeur / Préfet via lien crypté à usage unique
+/// Écran d'activation de compte Directeur / Préfet via lien crypté à usage unique + Google Auth
 class InviteActivationScreen extends StatefulWidget {
   final String token;
 
@@ -14,17 +14,10 @@ class InviteActivationScreen extends StatefulWidget {
 
 class _InviteActivationScreenState extends State<InviteActivationScreen> {
   final FirestoreServiceRDC _service = FirestoreServiceRDC();
-  final _formKey = GlobalKey<FormState>();
-  final _prenomController = TextEditingController();
-  final _nomController = TextEditingController();
-  final _passController = TextEditingController();
-  final _confirmPassController = TextEditingController();
-
   InvitationDirecteur? _invitation;
   bool _chargementInitial = true;
   bool _chargementSoumission = false;
   String? _erreur;
-  bool _cacherMotDePasse = true;
 
   @override
   void initState() {
@@ -54,26 +47,32 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
     }
   }
 
-  Future<void> _activerCompte() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _activerCompteAvecGoogle() async {
     setState(() => _chargementSoumission = true);
 
     try {
-      await _service.consommerInvitationDirecteur(
-        token: widget.token,
-        motDePasse: _passController.text.trim(),
-        prenom: _prenomController.text.trim(),
-        nom: _nomController.text.trim(),
-      );
+      final userCred = await _service.connnecterAvecGoogle(roleSouhaite: 'directeur');
+      final user = userCred.user;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Compte Directeur activé avec succès ! Connexion en cours...'),
-            backgroundColor: Colors.green,
-          ),
+      if (user != null) {
+        await _service.consommerInvitationDirecteur(
+          token: widget.token,
+          motDePasse: 'google_auth_sso',
+          prenom: user.displayName?.split(' ').first ?? 'Directeur',
+          nom: (user.displayName?.split(' ').length ?? 0) > 1
+              ? user.displayName!.split(' ').sublist(1).join(' ')
+              : '',
         );
-        Navigator.of(context).pushReplacementNamed('/');
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Compte Directeur activé avec succès avec votre compte Google !'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.of(context).pushReplacementNamed('/');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -87,20 +86,10 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
   }
 
   @override
-  void dispose() {
-    _prenomController.dispose();
-    _nomController.dispose();
-    _passController.dispose();
-    _confirmPassController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
-    final inputBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     if (_chargementInitial) {
       return const Scaffold(
@@ -129,13 +118,18 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Lien d\'invitation invalide',
-                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: primaryTextColor),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: primaryTextColor,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   _erreur ?? 'Ce lien a expiré ou a déjà été consommé.',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
+                  ),
                 ),
                 const SizedBox(height: 28),
                 FilledButton(
@@ -152,161 +146,88 @@ class _InviteActivationScreenState extends State<InviteActivationScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Activation de votre compte Directeur', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Activation Direction Écoles',
+          style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 480),
             child: Card(
               color: isDark ? const Color(0xFF1E293B) : Colors.white,
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.verified_user_rounded, size: 40, color: Colors.blue),
-                            const SizedBox(height: 8),
-                            Text(
-                              _invitation!.ecoleNom,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? const Color(0xFFEFF6FF) : const Color(0xFF1E40AF),
-                              ),
+                padding: const EdgeInsets.all(28.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.verified_user_rounded, size: 44, color: Colors.blue),
+                          const SizedBox(height: 10),
+                          Text(
+                            _invitation!.ecoleNom,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? const Color(0xFFEFF6FF) : const Color(0xFF1E40AF),
                             ),
-                            Text(
-                              _invitation!.emailDirecteur,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      Text(
-                        'Complétez votre profil de Direction',
-                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, color: primaryTextColor),
-                      ),
-                      const SizedBox(height: 16),
-
-                      Text(
-                        'Votre Prénom *',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
-                      ),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: _prenomController,
-                        style: TextStyle(color: primaryTextColor, fontSize: 15),
-                        decoration: InputDecoration(
-                          hintText: 'Prénom',
-                          prefixIcon: Icon(Icons.person_outline, color: theme.colorScheme.primary),
-                          fillColor: inputBgColor,
-                          filled: true,
-                        ),
-                        validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
-                      ),
-                      const SizedBox(height: 16),
-
-                      Text(
-                        'Votre Nom de famille *',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
-                      ),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: _nomController,
-                        style: TextStyle(color: primaryTextColor, fontSize: 15),
-                        decoration: InputDecoration(
-                          hintText: 'Nom de famille',
-                          prefixIcon: Icon(Icons.badge_outlined, color: theme.colorScheme.primary),
-                          fillColor: inputBgColor,
-                          filled: true,
-                        ),
-                        validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
-                      ),
-                      const SizedBox(height: 16),
-
-                      Text(
-                        'Définir un mot de passe *',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
-                      ),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: _passController,
-                        obscureText: _cacherMotDePasse,
-                        style: TextStyle(color: primaryTextColor, fontSize: 15),
-                        decoration: InputDecoration(
-                          hintText: 'Au moins 6 caractères',
-                          prefixIcon: Icon(Icons.lock_outline, color: theme.colorScheme.primary),
-                          suffixIcon: IconButton(
-                            icon: Icon(_cacherMotDePasse ? Icons.visibility : Icons.visibility_off, color: theme.colorScheme.primary),
-                            onPressed: () => setState(() => _cacherMotDePasse = !_cacherMotDePasse),
                           ),
-                          fillColor: inputBgColor,
-                          filled: true,
-                        ),
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return 'Champ obligatoire';
-                          if (v.length < 6) return 'Au moins 6 caractères nécessaires';
-                          return null;
-                        },
+                          const SizedBox(height: 4),
+                          Text(
+                            'Invitation Direction Réseau EduTrack',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E3A8A),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
+                    ),
+                    const SizedBox(height: 28),
 
-                      Text(
-                        'Confirmer le mot de passe *',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryTextColor),
+                    Text(
+                      'Activez votre compte avec votre adresse Google pour finaliser la prise de fonction.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
                       ),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: _confirmPassController,
-                        obscureText: _cacherMotDePasse,
-                        style: TextStyle(color: primaryTextColor, fontSize: 15),
-                        decoration: InputDecoration(
-                          hintText: 'Répétez votre mot de passe',
-                          prefixIcon: Icon(Icons.lock_reset_outlined, color: theme.colorScheme.primary),
-                          fillColor: inputBgColor,
-                          filled: true,
-                        ),
-                        validator: (v) {
-                          if (v != _passController.text) return 'Les mots de passe ne correspondent pas';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 28),
+                    ),
+                    const SizedBox(height: 24),
 
-                      FilledButton.icon(
-                        onPressed: _chargementSoumission ? null : _activerCompte,
-                        icon: _chargementSoumission
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              )
-                            : const Icon(Icons.check_circle_outline, color: Colors.white),
-                        label: const Text('Activer mon compte & Accéder à l\'école', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white)),
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size.fromHeight(52),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
+                    ElevatedButton.icon(
+                      onPressed: _chargementSoumission ? null : _activerCompteAvecGoogle,
+                      icon: _chargementSoumission
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                            )
+                          : const Icon(Icons.g_mobiledata_rounded, size: 34, color: Colors.white),
+                      label: Text(
+                        _chargementSoumission ? 'Activation en cours...' : 'Activer avec mon compte Google',
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
-                    ],
-                  ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(54),
+                        backgroundColor: const Color(0xFF2563EB),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "copa-ecole",
     "public": "build/web",
     "ignore": [
       "firebase.json",
