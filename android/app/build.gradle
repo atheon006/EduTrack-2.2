@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId "com.edutrack.school_app"
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName

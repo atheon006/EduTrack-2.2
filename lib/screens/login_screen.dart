@@ -59,16 +59,23 @@ class _LoginScreenState extends State<LoginScreen> {
   // Helper methods for role-related information
   String _getRoleName(String role) {
     switch (role) {
+      case 'super_admin':
+      case 'superAdmin':
+        return 'Super Administrateur';
+      case 'directeur':
+        return 'Directeur / Préfet';
       case 'school_admin':
-        return 'School Admin';
+        return 'Administrateur Scolaire';
       case 'teacher':
-        return 'Teacher';
+      case 'enseignant':
+        return 'Enseignant';
       case 'student':
-        return 'Student';
+      case 'eleve':
+        return 'Élève';
       case 'parent':
-        return 'Parent';
+        return 'Parent / Tuteur';
       default:
-        return 'User';
+        return 'Utilisateur';
     }
   }
 
@@ -106,6 +113,26 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     switch (role) {
+      case 'super_admin':
+      case 'superAdmin':
+        final superAdmin = UtilisateurEduTrack(
+          id: user.id,
+          email: user.email,
+          role: RoleUtilisateur.superAdmin,
+          profil: ProfilUtilisateur(
+            prenom: user.profile.firstName,
+            nom: user.profile.lastName,
+          ),
+          createdAt: DateTime.now(),
+        );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SuperAdminDashboard(superAdmin: superAdmin)),
+          (route) => false,
+        );
+        break;
+      case 'directeur':
       case 'school_admin':
         Navigator.pushAndRemoveUntil(
           context,
@@ -115,6 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         break;
       case 'teacher':
+      case 'enseignant':
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => TeacherDashboard(user: user)),
@@ -122,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         break;
       case 'student':
+      case 'eleve':
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => StudentDashboard(user: user)),
@@ -137,9 +166,45 @@ class _LoginScreenState extends State<LoginScreen> {
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$role dashboard not implemented yet')),
+          SnackBar(content: Text('Tableau de bord non implémenté pour le rôle $role')),
         );
     }
+  }
+
+  void _loginAsDemoUser(String role) async {
+    final demoName = role == 'super_admin'
+        ? 'Super Admin EduTrack'
+        : role == 'directeur'
+            ? 'Préfet Mukendi'
+            : role == 'teacher'
+                ? 'Prof. Mwamba'
+                : role == 'student'
+                    ? 'Kabila Jean'
+                    : 'Mme Ilunga';
+
+    final user = User(
+      id: 'demo_${role}_123',
+      email: '$role@edutrack-rdc.cd',
+      role: role,
+      schoolToken: 'DEMO_TOKEN',
+      schoolName: 'Complexe Scolaire La Sagesse (Kinshasa)',
+      profile: UserProfile(
+        firstName: demoName.split(' ')[0],
+        lastName: demoName.split(' ').length > 1 ? demoName.split(' ')[1] : '',
+        phone: '+243 812 345 678',
+        address: 'Kinshasa, RDC',
+        profilePicture: '',
+      ),
+    );
+
+    await StorageUtil.setString('userId', user.id);
+    await StorageUtil.setString('userEmail', user.email);
+    await StorageUtil.setString('userRole', user.role);
+    await StorageUtil.setString('userFirstName', user.profile.firstName);
+    await StorageUtil.setString('userLastName', user.profile.lastName);
+    await StorageUtil.setBool('isLoggedIn', true);
+
+    _navigateBasedOnRole(role, user);
   }
 
   void _handleLogin() async {
@@ -678,6 +743,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginForm() {
+    final roleColor = _getRoleColor(_selectedRole);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -685,18 +752,18 @@ class _LoginScreenState extends State<LoginScreen> {
           TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: 'Email',
+              labelText: 'Adresse Email',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.email),
+              prefixIcon: const Icon(Icons.email_outlined),
               filled: true,
               fillColor: Colors.grey.shade50,
             ),
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your email';
+                return 'Veuillez entrer votre email';
               }
               return null;
             },
@@ -705,11 +772,11 @@ class _LoginScreenState extends State<LoginScreen> {
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: 'Mot de passe',
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.lock),
+              prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -726,7 +793,7 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: _obscurePassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your password';
+                return 'Veuillez entrer votre mot de passe';
               }
               return null;
             },
@@ -734,19 +801,19 @@ class _LoginScreenState extends State<LoginScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: _showForgotPasswordDialog, // Update this line
-              child: const Text('Forgot Password?'),
+              onPressed: _showForgotPasswordDialog,
+              child: const Text('Mot de passe oublié ?'),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
-              backgroundColor: _getRoleColor(_selectedRole),
+              backgroundColor: roleColor,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
             ),
@@ -760,9 +827,35 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   )
                 : const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 16),
+                    'Se connecter',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
+          ),
+          const SizedBox(height: 16),
+          const Row(
+            children: [
+              Expanded(child: Divider()),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text('OU', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              ),
+              Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: () => _loginAsDemoUser(_selectedRole),
+            icon: const Icon(Icons.bolt, color: Colors.amber),
+            label: Text(
+              'Connexion Rapide (Démo ${_getRoleName(_selectedRole)})',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ],
       ),
