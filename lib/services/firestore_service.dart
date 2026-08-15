@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import '../models/ecole_rdc_model.dart';
 import '../models/classe_rdc_model.dart';
 import '../models/utilisateur_model.dart';
+import '../models/invitation_model.dart';
+
+/// Email unique du Super Administrateur
+const String kSuperAdminEmail = 'readykalonda38@gmail.com';
 
 /// Service Firestore central adapté au système EduTrack RDC
-/// Gère : Super Admin, Directeurs, Enseignants, Élèves, Parents
+/// Gère : Super Admin (readykalonda38@gmail.com), Directeurs (par liens d'invitation), Enseignants, Élèves, Parents (avec ID élève)
 class FirestoreServiceRDC {
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
@@ -20,12 +26,21 @@ class FirestoreServiceRDC {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // ══════════════════════════════════════════════════
-  // AUTHENTIFICATION
+  // AUTHENTIFICATION SÉCURISÉE
   // ══════════════════════════════════════════════════
 
-  Future<UserCredential> seConnecter(String email, String motDePasse) async {
+  Future<UserCredential> seConnecter(String email, String motDePasse, String roleSouhaite) async {
+    final emailClean = email.trim().toLowerCase();
+
+    // Verrouillage Super Admin
+    if (roleSouhaite == 'super_admin' || roleSouhaite == 'superAdmin') {
+      if (emailClean != kSuperAdminEmail.toLowerCase()) {
+        throw Exception('Accès refusé : Seul l\'administrateur principal (readykalonda38@gmail.com) peut se connecter comme Super Administrateur.');
+      }
+    }
+
     return await _auth.signInWithEmailAndPassword(
-      email: email.trim(),
+      email: emailClean,
       password: motDePasse.trim(),
     );
   }
@@ -59,10 +74,139 @@ class FirestoreServiceRDC {
   }
 
   // ══════════════════════════════════════════════════
+  // LIENS D'INVITATION UNIQUE DIRECTEUR / PRÉFET
+  // ══════════════════════════════════════════════════
+
+  /// Génère un lien unique d'invitation crypté à usage unique pour un Directeur
+  Future<String> genererLienInvitationDirecteur({
+    required String ecoleId,
+    required String ecoleNom,
+    required String emailDirecteur,
+  }) async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final rawString = '$ecoleId-$emailDirecteur-$timestamp-edutrack-secret-key';
+    final token = sha256.convert(utf8.encode(rawString)).toString();
+
+    final invitation = InvitationDirecteur(
+      id: '',
+      ecoleId: ecoleId,
+      ecoleNom: ecoleNom,
+      emailDirecteur: emailDirecteur.trim().toLowerCase(),
+      token: token,
+      estUtilise: false,
+      createdAt: DateTime.now(),
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
+    );
+
+    await _db.collection('invitations').add(invitation.toMap());
+
+    // Génère l'URL complète d'invitation
+    return 'https://copa-ecole.web.app/#/invite?token=$token';
+  }
+
+  /// Récupère une invitation par son token
+  Future<InvitationDirecteur?> getInvitationParToken(String token) async {
+    final snap = await _db
+        .collection('invitations')
+        .where('token', isEqualTo: token)
+        .where('estUtilise', isEqualTo: false)
+        .limit(1)
+        .get();
+
+    if (snap.docs.isEmpty) return null;
+    final inv = InvitationDirecteur.fromMap(snap.docs.first.data(), snap.docs.first.id);
+    if (!inv.estValide) return null;
+    return inv;
+  }
+
+  /// Active le compte d'un Directeur via son token unique et détruit le token
+  Future<UtilisateurEduTrack> consommerInvitationDirecteur({
+    required String token,
+    required String motDePasse,
+    required String prenom,
+    required String nom,
+  }) async {
+    final inv = await getInvitationParToken(token);
+    if (inv == null) {
+      throw Exception('Lien d\'invitation invalide, expiré ou déjà utilisé.');
+    }
+
+    // 1. Création compte Firebase Auth
+    final creds = await _auth.createUserWithEmailAndPassword(
+      email: inv.emailDirecteur,
+      password: motDePasse,
+    );
+    final uid = creds.user!.uid;
+
+    final utilisateur = UtilisateurEduTrack(
+      id: uid,
+      email: inv.emailDirecteur,
+      role: RoleUtilisateur.directeur,
+      profil: ProfilUtilisateur(prenom: prenom, nom: nom),
+      schoolId: inv.ecoleId,
+      createdAt: DateTime.now(),
+    );
+
+    final batch = _db.batch();
+
+    // 2. Sauvegarde du profil directeur
+    batch.set(_db.collection('utilisateurs').doc(uid), utilisateur.toMap());
+
+    // 3. Mise à jour de l'école
+    batch.update(_db.collection('ecoles').doc(inv.ecoleId), {
+      'directeurId': uid,
+      'directeurNom': '$prenom $nom'.trim(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    // 4. Marquer le token comme définitivement consommé/utilisé (ou suppression)
+    batch.update(_db.collection('invitations').doc(inv.id), {
+      'estUtilise': true,
+      'utiliseLe': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+    return utilisateur;
+  }
+
+  // ══════════════════════════════════════════════════
+  // INSCRIPTION PUBLIQUE DES PARENTS (AVEC CODE ÉLÈVE)
+  // ══════════════════════════════════════════════════
+
+  /// Inscription d'un parent réservée sur l'application publique avec liaison ID élève
+  Future<UserCredential> inscrireParent({
+    required String email,
+    required String motDePasse,
+    required String prenom,
+    required String nom,
+    required String codeEleve,
+  }) async {
+    final emailClean = email.trim().toLowerCase();
+
+    // 1. Inscription Firebase Auth
+    final creds = await _auth.createUserWithEmailAndPassword(
+      email: emailClean,
+      password: motDePasse,
+    );
+    final uid = creds.user!.uid;
+
+    final parent = UtilisateurEduTrack(
+      id: uid,
+      email: emailClean,
+      role: RoleUtilisateur.parent,
+      profil: ProfilUtilisateur(prenom: prenom, nom: nom),
+      eleveIds: [codeEleve.trim()],
+      createdAt: DateTime.now(),
+    );
+
+    await _db.collection('utilisateurs').doc(uid).set(parent.toMap());
+    return creds;
+  }
+
+  // ══════════════════════════════════════════════════
   // SUPER ADMIN — GESTION DES ÉCOLES
   // ══════════════════════════════════════════════════
 
-  /// Créer une nouvelle école
   Future<String> creerEcole(EcoleRDC ecole) async {
     final data = ecole.toMap();
     data['createdAt'] = FieldValue.serverTimestamp();
@@ -71,7 +215,6 @@ class FirestoreServiceRDC {
     return ref.id;
   }
 
-  /// Lister toutes les écoles (Super Admin)
   Stream<List<EcoleRDC>> streamToutesLesEcoles() {
     return _db
         .collection('ecoles')
@@ -82,7 +225,6 @@ class FirestoreServiceRDC {
             .toList());
   }
 
-  /// Nommer un directeur (directeur = aussi admin scolaire)
   Future<void> nommerDirecteur({
     required String ecoleId,
     required String userId,
@@ -90,14 +232,12 @@ class FirestoreServiceRDC {
   }) async {
     final batch = _db.batch();
 
-    // Mise à jour de l'école
     batch.update(_db.collection('ecoles').doc(ecoleId), {
       'directeurId': userId,
       'directeurNom': nomDirecteur,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    // Mise à jour du profil utilisateur
     batch.update(_db.collection('utilisateurs').doc(userId), {
       'role': RoleUtilisateur.directeur.name,
       'schoolId': ecoleId,
@@ -107,13 +247,11 @@ class FirestoreServiceRDC {
     await batch.commit();
   }
 
-  /// Mettre à jour les infos d'une école
   Future<void> mettreAJourEcole(String ecoleId, Map<String, dynamic> data) async {
     data['updatedAt'] = FieldValue.serverTimestamp();
     await _db.collection('ecoles').doc(ecoleId).update(data);
   }
 
-  /// Statistiques globales (Super Admin)
   Future<Map<String, int>> getStatistiquesGlobales() async {
     final ecoles = await _db.collection('ecoles').count().get();
     final utilisateurs = await _db.collection('utilisateurs').count().get();
@@ -137,10 +275,9 @@ class FirestoreServiceRDC {
   }
 
   // ══════════════════════════════════════════════════
-  // GESTION DES CLASSES (Primaire & Secondaire)
+  // GESTION DES CLASSES
   // ══════════════════════════════════════════════════
 
-  /// Créer une classe
   Future<String> creerClasse(ClasseRDC classe) async {
     final data = classe.toMap();
     data['createdAt'] = FieldValue.serverTimestamp();
@@ -153,7 +290,6 @@ class FirestoreServiceRDC {
     return ref.id;
   }
 
-  /// Stream de toutes les classes d'une école
   Stream<List<ClasseRDC>> streamClassesEcole(String schoolId,
       {CycleEnseignement? cycle}) {
     Query<Map<String, dynamic>> query = _db
@@ -170,133 +306,15 @@ class FirestoreServiceRDC {
         snap.docs.map((doc) => ClasseRDC.fromMap(doc.data(), doc.id)).toList());
   }
 
-  /// Stream des classes d'un enseignant (par ses attributions)
-  Stream<List<ClasseRDC>> streamClassesEnseignant(
-      String schoolId, String enseignantId) {
-    return _db
-        .collection('ecoles')
-        .doc(schoolId)
-        .collection('classes')
-        .where('attributions', arrayContains: {'enseignantId': enseignantId})
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => ClasseRDC.fromMap(doc.data(), doc.id))
-            .toList());
-  }
-
-  /// Ajouter un enseignant à une classe (attribution matière)
-  Future<void> ajouterAttributionMatiere(
-      String schoolId, String classeId, AttributionMatiere attribution) async {
-    await _db
-        .collection('ecoles')
-        .doc(schoolId)
-        .collection('classes')
-        .doc(classeId)
-        .update({
-      'attributions': FieldValue.arrayUnion([attribution.toMap()]),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
-  /// Mettre à jour une classe
-  Future<void> mettreAJourClasse(
-      String schoolId, String classeId, Map<String, dynamic> data) async {
-    data['updatedAt'] = FieldValue.serverTimestamp();
-    await _db
-        .collection('ecoles')
-        .doc(schoolId)
-        .collection('classes')
-        .doc(classeId)
-        .update(data);
-  }
-
   // ══════════════════════════════════════════════════
-  // NOTES (RÉSULTATS SCOLAIRES)
-  // ══════════════════════════════════════════════════
-
-  Stream<List<Map<String, dynamic>>> streamNotesEleve(String eleveId) {
-    return _db
-        .collection('notes')
-        .where('eleveId', isEqualTo: eleveId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => {'id': doc.id, ...doc.data()})
-            .toList());
-  }
-
-  Stream<List<Map<String, dynamic>>> streamNotesClasse(
-      String classeId, String matiereId) {
-    return _db
-        .collection('notes')
-        .where('classeId', isEqualTo: classeId)
-        .where('matiereId', isEqualTo: matiereId)
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => {'id': doc.id, ...doc.data()})
-            .toList());
-  }
-
-  Future<void> enregistrerNote(Map<String, dynamic> noteData) async {
-    noteData['createdAt'] = FieldValue.serverTimestamp();
-    noteData['updatedAt'] = FieldValue.serverTimestamp();
-    if (noteData['id'] != null) {
-      final id = noteData.remove('id') as String;
-      await _db.collection('notes').doc(id).set(noteData, SetOptions(merge: true));
-    } else {
-      await _db.collection('notes').add(noteData);
-    }
-  }
-
-  // ══════════════════════════════════════════════════
-  // ABSENCES
-  // ══════════════════════════════════════════════════
-
-  Stream<List<Map<String, dynamic>>> streamAbsencesEleve(String eleveId) {
-    return _db
-        .collection('absences')
-        .where('eleveId', isEqualTo: eleveId)
-        .orderBy('date', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => {'id': doc.id, ...doc.data()})
-            .toList());
-  }
-
-  Future<void> enregistrerAbsence(Map<String, dynamic> absenceData) async {
-    absenceData['timestamp'] = FieldValue.serverTimestamp();
-    await _db.collection('absences').add(absenceData);
-  }
-
-  // ══════════════════════════════════════════════════
-  // ANNONCES
-  // ══════════════════════════════════════════════════
-
-  Stream<List<Map<String, dynamic>>> streamAnnonces(String schoolId) {
-    return _db
-        .collection('annonces')
-        .where('schoolId', isEqualTo: schoolId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs
-            .map((doc) => {'id': doc.id, ...doc.data()})
-            .toList());
-  }
-
-  Future<void> publierAnnonce(Map<String, dynamic> annonceData) async {
-    annonceData['createdAt'] = FieldValue.serverTimestamp();
-    await _db.collection('annonces').add(annonceData);
-  }
-
-  // ══════════════════════════════════════════════════
-  // RECHERCHE UTILISATEURS (pour nommer un directeur)
+  // RECHERCHE UTILISATEURS
   // ══════════════════════════════════════════════════
 
   Future<List<UtilisateurEduTrack>> rechercherUtilisateurs(String email) async {
     final snap = await _db
         .collection('utilisateurs')
-        .where('email', isGreaterThanOrEqualTo: email)
-        .where('email', isLessThanOrEqualTo: '$email\uf8ff')
+        .where('email', isGreaterThanOrEqualTo: email.trim().toLowerCase())
+        .where('email', isLessThanOrEqualTo: '${email.trim().toLowerCase()}\uf8ff')
         .limit(10)
         .get();
     return snap.docs

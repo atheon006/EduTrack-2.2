@@ -833,32 +833,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
           ),
-          const SizedBox(height: 16),
-          const Row(
-            children: [
-              Expanded(child: Divider()),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text('OU', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              ),
-              Expanded(child: Divider()),
-            ],
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () => _loginAsDemoUser(_selectedRole),
-            icon: const Icon(Icons.bolt, color: Colors.amber),
-            label: Text(
-              'Connexion Rapide (Démo ${_getRoleName(_selectedRole)})',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 48),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
         ],
       ),
     );

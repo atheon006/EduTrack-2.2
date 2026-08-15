@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:async';
 import 'utils/storage_util.dart';
 import 'screens/role_selection_screen.dart';
+import 'screens/invite_activation_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/theme_notifier.dart';
 import 'models/user_model.dart';
@@ -127,6 +128,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             Locale('en', 'US'),
           ],
           home: const SplashScreen(),
+          onGenerateRoute: (settings) {
+            final uri = Uri.parse(settings.name ?? '');
+            if (uri.path == '/invite' || uri.path == '/#/invite') {
+              final token = uri.queryParameters['token'] ?? '';
+              return MaterialPageRoute(
+                builder: (_) => InviteActivationScreen(token: token),
+              );
+            }
+            return null;
+          },
         );
       },
     );

@@ -511,16 +511,23 @@ class _CarteEcole extends StatelessWidget {
                     ),
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: onNommerDirecteur,
-                  icon: const Icon(Icons.edit, size: 14),
-                  label: const Text('Nommer', style: TextStyle(fontSize: 12)),
+                OutlinedButton.icon(
+                  onPressed: () => _afficherDialogueGenererLien(context, ecole),
+                  icon: const Icon(Icons.vpn_key_outlined, size: 14),
+                  label: const Text('Lien unique', style: TextStyle(fontSize: 12)),
                 ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _afficherDialogueGenererLien(BuildContext context, EcoleRDC ecole) {
+    showDialog(
+      context: context,
+      builder: (_) => _DialogueGenererLienInvitation(ecole: ecole),
     );
   }
 }
@@ -944,6 +951,135 @@ class _GestionUtilisateurs extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════
+// DIALOGUE GÉNÉRER LIEN INVITATION UNIQUE
+// ════════════════════════════════════════════
+class _DialogueGenererLienInvitation extends StatefulWidget {
+  final EcoleRDC ecole;
+
+  const _DialogueGenererLienInvitation({required this.ecole});
+
+  @override
+  State<_DialogueGenererLienInvitation> createState() => _DialogueGenererLienInvitationState();
+}
+
+class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvitation> {
+  final FirestoreServiceRDC _service = FirestoreServiceRDC();
+  final _emailController = TextEditingController();
+
+  String? _lienGenere;
+  bool _chargement = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _generer() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez entrer une adresse email valide.')),
+      );
+      return;
+    }
+
+    setState(() => _chargement = true);
+    try {
+      final url = await _service.genererLienInvitationDirecteur(
+        ecoleId: widget.ecole.id,
+        ecoleNom: widget.ecole.nom,
+        emailDirecteur: email,
+      );
+      if (mounted) {
+        setState(() => _lienGenere = url);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _chargement = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Invitation du Directeur / Préfet\n${widget.ecole.nom}',
+          style: const TextStyle(fontSize: 16)),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_lienGenere == null) ...[
+              const Text(
+                'Entrez l\'adresse email du futur Directeur. Un lien d\'activation crypté à usage unique sera généré.',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Email du Directeur / Préfet *',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
+              ),
+            ] else ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Lien unique d\'invitation généré ! Ce lien expirera dès sa première utilisation.',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              SelectableText(
+                _lienGenere!,
+                style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.blue),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(_lienGenere != null ? 'Fermer' : 'Annuler'),
+        ),
+        if (_lienGenere == null)
+          FilledButton.icon(
+            onPressed: _chargement ? null : _generer,
+            icon: _chargement
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.vpn_key),
+            label: const Text('Générer le lien'),
+          ),
+      ],
     );
   }
 }

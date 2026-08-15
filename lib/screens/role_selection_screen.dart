@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/login_screen.dart';
+import '../screens/parent_signup_screen.dart';
 import '../utils/storage_util.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -40,33 +41,32 @@ class RoleSelectionScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Hero Logo
+                  // App Logo Header
                   Hero(
                     tag: 'app_logo',
                     child: Container(
-                      height: 100,
-                      width: 100,
+                      height: 90,
+                      width: 90,
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: const Icon(
                         Icons.school_rounded,
-                        size: 54,
+                        size: 48,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
-                  // App Title
                   Text(
                     'EduTrack RDC',
                     textAlign: TextAlign.center,
@@ -75,35 +75,25 @@ class RoleSelectionScreen extends StatelessWidget {
                       color: theme.colorScheme.primary,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
 
                   Text(
-                    'Système de gestion scolaire pour la RDC',
+                    'Portail Officiel de Gestion Scolaire',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 24),
 
-                  Text(
-                    'Choisissez votre rôle pour accéder au portail',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Roles list
+                  // Role Selection Buttons
                   _buildRoleButton(
                     context: context,
                     role: 'super_admin',
                     label: 'Super Administrateur',
-                    subtitle: 'Gestion globale de toutes les écoles du réseau',
-                    icon: Icons.public_rounded,
-                    color: Colors.indigo,
+                    subtitle: 'Accès exclusif (readykalonda38@gmail.com)',
+                    icon: Icons.shield_rounded,
+                    color: Colors.indigo.shade800,
                   ),
                   const SizedBox(height: 12),
 
@@ -111,7 +101,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     context: context,
                     role: 'directeur',
                     label: 'Directeur / Préfet',
-                    subtitle: 'Direction de l\'établissement et administration',
+                    subtitle: 'Connexion direction d\'établissement',
                     icon: Icons.admin_panel_settings_rounded,
                     color: Colors.blue.shade700,
                   ),
@@ -121,7 +111,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     context: context,
                     role: 'teacher',
                     label: 'Enseignant / Professeur',
-                    subtitle: 'Gestion des cours, présences et bulletins',
+                    subtitle: 'Espace corps professoral',
                     icon: Icons.record_voice_over_rounded,
                     color: Colors.teal.shade700,
                   ),
@@ -131,7 +121,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     context: context,
                     role: 'student',
                     label: 'Élève',
-                    subtitle: 'Consultation des horaires, notes et annonces',
+                    subtitle: 'Portail des élèves',
                     icon: Icons.person_rounded,
                     color: Colors.orange.shade800,
                   ),
@@ -141,9 +131,34 @@ class RoleSelectionScreen extends StatelessWidget {
                     context: context,
                     role: 'parent',
                     label: 'Parent / Tuteur',
-                    subtitle: 'Suivi du parcours et frais scolaires des enfants',
+                    subtitle: 'Connexion espace tuteur',
                     icon: Icons.family_restroom_rounded,
                     color: Colors.purple.shade700,
+                  ),
+                  const SizedBox(height: 24),
+
+                  const Divider(),
+                  const SizedBox(height: 12),
+
+                  // Public Parent Signup Section
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ParentSignupScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    label: const Text(
+                      'Nouveau Parent ? Créer un compte avec l\'ID Élève',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -162,16 +177,14 @@ class RoleSelectionScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
   }) {
-    final theme = Theme.of(context);
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: color.withValues(alpha: 0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -215,7 +228,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    size: 26,
+                    size: 24,
                     color: Colors.white,
                   ),
                 ),
@@ -228,7 +241,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       Text(
                         label,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -237,7 +250,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
@@ -247,7 +260,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: Colors.white.withValues(alpha: 0.9),
-                  size: 16,
+                  size: 14,
                 ),
               ],
             ),
