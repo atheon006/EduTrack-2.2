@@ -1,1 +1,39 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"school-e04b8","appId":"1:371745891018:android:f7f82bbd0a559a6788ca33","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"school-e04b8","configurations":{"android":"1:371745891018:android:f7f82bbd0a559a6788ca33","ios":"1:371745891018:ios:c5354e68a2b6551388ca33","macos":"1:371745891018:ios:c5354e68a2b6551388ca33","web":"1:371745891018:web:23a9a2c316c5ec0e88ca33","windows":"1:371745891018:web:c05ffd764f02899688ca33"}}}}}}
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "copa-ecole",
+          "appId": "1:371745891018:android:f7f82bbd0a559a6788ca33",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "copa-ecole",
+          "configurations": {
+            "android": "1:371745891018:android:f7f82bbd0a559a6788ca33",
+            "ios": "1:371745891018:ios:c5354e68a2b6551388ca33",
+            "macos": "1:371745891018:ios:c5354e68a2b6551388ca33",
+            "web": "1:371745891018:web:23a9a2c316c5ec0e88ca33",
+            "windows": "1:371745891018:web:c05ffd764f02899688ca33"
+          }
+        }
+      }
+    }
+  }
+}
