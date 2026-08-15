@@ -1,10 +1,29 @@
 {
   "project_info": {
     "project_number": "371745891018",
-    "project_id": "school-e04b8",
-    "storage_bucket": "school-e04b8.firebasestorage.app"
+    "project_id": "copa-ecole",
+    "storage_bucket": "copa-ecole.appspot.com"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371745891018:android:f7f82bbd0a559a6788ca33",
+        "android_client_info": {
+          "package_name": "com.edutrack.school_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp7XmDYOuQsHS0obhS3WW1ZmtPmq8pD-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:371745891018:android:f7f82bbd0a559a6788ca33",
