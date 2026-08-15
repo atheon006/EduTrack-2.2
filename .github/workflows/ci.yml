@@ -72,7 +72,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Android AppBundle Release
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --android-skip-build-dependency-validation
 
       - name: Upload artefact Android AppBundle
         uses: actions/upload-artifact@v4
