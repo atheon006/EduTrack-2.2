@@ -9,11 +9,19 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|wasm|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2)",
+        "source": "**/*.@(js|wasm|html)",
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=31536000, immutable"
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Pragma",
+            "value": "no-cache"
+          },
+          {
+            "key": "Expires",
+            "value": "0"
           }
         ]
       },
