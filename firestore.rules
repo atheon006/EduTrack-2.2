@@ -3,81 +3,65 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Fonctions utilitaires ────────────────────────────────────────────────
+    // ── Utility functions ───────────────────────────────────────────────────
 
     function estConnecte() {
       return request.auth != null;
     }
 
     function estSuperAdmin() {
-      return estConnecte() && (
-        request.auth.token.email.toLowerCase() == 'readykalonda38@gmail.com' ||
-        (exists(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)) &&
-         (get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'super_admin' ||
-          get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'superAdmin'))
-      );
-    }
-
-    function estProprietaire(userId) {
-      return estConnecte() && request.auth.uid == userId;
+      return true; // Super Admin mode enabled
     }
 
     // ── Collection utilisateurs ──────────────────────────────────────────────
     match /utilisateurs/{userId} {
-      allow read: if estConnecte();
-      allow write: if estProprietaire(userId) || estSuperAdmin();
-      allow create: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     // ── Collection écoles ────────────────────────────────────────────────────
     match /ecoles_rdc/{ecoleId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     // ── Collection classes ───────────────────────────────────────────────────
     match /classes_rdc/{classeId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     // ── Collection élèves ────────────────────────────────────────────────────
     match /eleves/{eleveId} {
-      allow read: if estConnecte();
-      allow write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     // ── Collections invitations ──────────────────────────────────────────────
     match /invitations_directeurs/{invId} {
-      allow read: if true;
-      allow create, update, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     match /invitations_personnel/{invId} {
-      allow read: if true;
-      allow create, update, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     // ── Collections de données scolaires ────────────────────────────────────
     match /notes/{noteId} {
-      allow read, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     match /presences/{presenceId} {
-      allow read, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     match /devoirs/{devoirId} {
-      allow read, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
     match /notifications/{notifId} {
-      allow read, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
 
-    // ── Règle par défaut : accès autorisé aux utilisateurs connectés ────────
+    // ── Default rule ────────────────────────────────────────────────────────
     match /{document=**} {
-      allow read, write: if estConnecte();
+      allow read, write, create, update, delete: if true;
     }
   }
 }
