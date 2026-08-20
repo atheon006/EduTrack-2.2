@@ -8,6 +8,7 @@ import '../models/ecole_rdc_model.dart';
 import '../models/classe_rdc_model.dart';
 import '../models/utilisateur_model.dart';
 import '../models/invitation_model.dart';
+import '../utils/storage_util.dart';
 
 /// Email unique du Super Administrateur
 const String kSuperAdminEmail = 'readykalonda38@gmail.com';
@@ -178,6 +179,12 @@ class FirestoreServiceRDC {
     }, SetOptions(merge: true));
   }
 
+  Future<EcoleRDC?> getEcoleParId(String ecoleId) async {
+    final doc = await _db.collection('ecoles_rdc').doc(ecoleId).get();
+    if (!doc.exists) return null;
+    return EcoleRDC.fromMap(doc.data()!, doc.id);
+  }
+
   // ══════════════════════════════════════════════════
   // LIENS D'INVITATION UNIQUE DIRECTEUR / PRÉFET
   // ══════════════════════════════════════════════════
@@ -324,6 +331,15 @@ class FirestoreServiceRDC {
     );
 
     await sauvegarderUtilisateur(utilisateur);
+
+    // Persister la session localement pour éviter "School ID not found"
+    await StorageUtil.setString('userId', user.uid);
+    await StorageUtil.setString('userEmail', utilisateur.email);
+    await StorageUtil.setString('userRole', role == RoleUtilisateur.directeur ? 'school_admin' : 'teacher');
+    await StorageUtil.setString('schoolId', inv.ecoleId);
+    await StorageUtil.setString('schoolToken', inv.ecoleId);
+    await StorageUtil.setString('schoolName', inv.ecoleNom);
+    await StorageUtil.setBool('isLoggedIn', true);
 
     if (role == RoleUtilisateur.directeur) {
       await _db.collection('ecoles_rdc').doc(inv.ecoleId).set({

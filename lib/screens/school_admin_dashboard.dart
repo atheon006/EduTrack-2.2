@@ -7,8 +7,9 @@ import '../models/user_model.dart';
 import '../models/school_model.dart';
 import 'package:flutter/src/material/scaffold.dart';
 import '../utils/app_theme.dart';
-import '../utils/storage_util.dart'; 
+import '../utils/storage_util.dart';
 import '../services/fcm_service.dart';
+import '../services/firestore_service.dart';
 import '../services/image_service.dart' as image_service;
 import 'school_admin/class_management_screen.dart';
 import 'school_admin/teacher_management_screen.dart';
@@ -91,15 +92,31 @@ class _SchoolAdminDashboardState extends State<SchoolAdminDashboard> with Ticker
   // New method to load school information
   Future<void> _loadSchoolInfo() async {
     try {
-      // Get stored school information
-      final schoolName =
-          await StorageUtil.getString('schoolName') ?? 'Unknown School';
+      var schoolName = await StorageUtil.getString('schoolName') ?? '';
+      var schoolId = await StorageUtil.getString('schoolId') ?? widget.user.schoolToken;
 
-      setState(() {
-        _schoolName = schoolName;
-      });
-      // Also dump all storage for debugging
-      await StorageUtil.debugDumpAll();
+      // Fallback : Chercher dans Firestore si schoolId ou schoolName est absent
+      if (schoolId.isEmpty || schoolName.isEmpty || schoolName == 'Unknown School') {
+        final firestoreService = FirestoreServiceRDC();
+        final userDoc = await firestoreService.getUtilisateur(widget.user.id);
+        if (userDoc != null && (userDoc.schoolId ?? '').isNotEmpty) {
+          schoolId = userDoc.schoolId!;
+          await StorageUtil.setString('schoolId', schoolId);
+          await StorageUtil.setString('schoolToken', schoolId);
+
+          final ecole = await firestoreService.getEcoleParId(schoolId);
+          if (ecole != null) {
+            schoolName = ecole.nom;
+            await StorageUtil.setString('schoolName', schoolName);
+          }
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _schoolName = schoolName.isNotEmpty ? schoolName : 'EduTrack School';
+        });
+      }
     } catch (e) {
       _debugLog('⚠️ Error loading school info: $e');
     }
