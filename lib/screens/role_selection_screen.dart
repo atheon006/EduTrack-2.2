@@ -92,18 +92,6 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
 
-                  // ── Élève ──────────────────────────────────
-                  _buildRoleButton(
-                    context: context,
-                    role: 'student',
-                    label: 'Je suis Élève',
-                    subtitle: 'Consulte tes notes, devoirs et emploi du temps',
-                    icon: Icons.menu_book_rounded,
-                    color: const Color(0xFFD97706),
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 16),
-
                   // ── Parent ─────────────────────────────────
                   _buildRoleButton(
                     context: context,
@@ -114,7 +102,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     color: const Color(0xFF7C3AED),
                     isDark: isDark,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // ── Inscription Parent ─────────────────────
                   OutlinedButton.icon(

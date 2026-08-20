@@ -1134,8 +1134,6 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
                     _buildChipFilter('enseignant', 'Teachers'),
                     const SizedBox(width: 8),
                     _buildChipFilter('parent', 'Parents'),
-                    const SizedBox(width: 8),
-                    _buildChipFilter('eleve', 'Students'),
                   ],
                 ),
               ),
