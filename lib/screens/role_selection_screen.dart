@@ -3,9 +3,9 @@ import '../screens/login_screen.dart';
 import '../screens/parent_signup_screen.dart';
 import '../utils/storage_util.dart';
 
-/// Écran public d'accueil — visible par tout le monde
-/// Seuls Parent et Élève sont affichés.
-/// L'administration se connecte de façon invisible via son propre lien.
+/// Public Home Screen - Accessible to everyone
+/// Displays Student and Parent portals.
+/// Administration connects discretely via hidden access link.
 class RoleSelectionScreen extends StatelessWidget {
   final String schoolName;
   final String schoolToken;
@@ -38,7 +38,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo EduTrack
+                  // App Logo Header
                   Center(
                     child: Container(
                       height: 100,
@@ -82,7 +82,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    'Portail Scolaire',
+                    'School Management Portal',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -92,12 +92,12 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
 
-                  // ── Élève ──────────────────────────────────
+                  // ── Student ────────────────────────────────
                   _buildRoleButton(
                     context: context,
                     role: 'student',
-                    label: 'Je suis Élève',
-                    subtitle: 'Consulte tes notes, devoirs et emploi du temps',
+                    label: 'I am a Student',
+                    subtitle: 'Check grades, homework, and schedule',
                     icon: Icons.menu_book_rounded,
                     color: const Color(0xFFD97706),
                     isDark: isDark,
@@ -108,15 +108,15 @@ class RoleSelectionScreen extends StatelessWidget {
                   _buildRoleButton(
                     context: context,
                     role: 'parent',
-                    label: 'Je suis Parent / Tuteur',
-                    subtitle: 'Suis la scolarité de ton enfant',
+                    label: 'I am a Parent / Guardian',
+                    subtitle: 'Track your child\'s academic progress',
                     icon: Icons.family_restroom_rounded,
                     color: const Color(0xFF7C3AED),
                     isDark: isDark,
                   ),
                   const SizedBox(height: 32),
 
-                  // ── Inscription Parent ─────────────────────
+                  // ── Parent Sign Up Button ──────────────────
                   OutlinedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -126,7 +126,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     },
                     icon: const Icon(Icons.person_add_alt_1_rounded, size: 20),
                     label: const Text(
-                      'Créer un compte Parent',
+                      'Create Parent Account',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -142,12 +142,12 @@ class RoleSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // Lien discret d'accès administration (invisible pour l'utilisateur lambda)
+                  // Discreet Administration Access Link
                   GestureDetector(
                     onLongPress: () => _accesAdministration(context),
                     child: Center(
                       child: Text(
-                        '© EduTrack RDC',
+                        '© EduTrack System',
                         style: TextStyle(
                           fontSize: 11,
                           color: isDark
@@ -166,7 +166,6 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  /// Appui long sur le copyright → accès discret à l'administration
   void _accesAdministration(BuildContext context) {
     Navigator.push(
       context,

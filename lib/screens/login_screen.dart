@@ -42,21 +42,20 @@ class _LoginScreenState extends State<LoginScreen> {
     switch (role) {
       case 'super_admin':
       case 'superAdmin':
-        return 'Super Administrateur';
+        return 'Super Administrator';
       case 'directeur':
-        return 'Directeur / Préfet';
       case 'school_admin':
-        return 'Administrateur Scolaire';
+        return 'School Principal';
       case 'teacher':
       case 'enseignant':
-        return 'Enseignant';
+        return 'Teacher';
       case 'student':
       case 'eleve':
-        return 'Élève';
+        return 'Student';
       case 'parent':
-        return 'Parent / Tuteur';
+        return 'Parent / Guardian';
       default:
-        return 'Utilisateur';
+        return 'User';
     }
   }
 
@@ -102,33 +101,33 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Traduit les erreurs techniques en messages simples pour l'utilisateur
+  /// Translates technical error codes to clear English messages for the user
   String _traduireErreur(String erreur) {
     if (erreur.contains('popup_closed') || erreur.contains('popup-closed')) {
-      return 'La fenêtre Google a été fermée. Réessaie.';
+      return 'Google sign-in window was closed. Please try again.';
     }
     if (erreur.contains('cancelled') || erreur.contains('canceled')) {
-      return 'Connexion annulée. Réessaie quand tu veux.';
+      return 'Sign-in cancelled. Try again whenever you want.';
     }
     if (erreur.contains('network') || erreur.contains('Network')) {
-      return 'Pas de connexion internet. Vérifie ta connexion et réessaie.';
+      return 'No internet connection. Check your network and try again.';
     }
     if (erreur.contains('permission-denied') || erreur.contains('PERMISSION_DENIED')) {
-      return 'Accès refusé. Ton compte n\'est pas autorisé pour cette action.';
+      return 'Access denied. Your account is not authorized for this action.';
     }
     if (erreur.contains('configuration-not-found')) {
-      return 'Problème de configuration. Contacte l\'administrateur.';
+      return 'Configuration issue. Please contact administrator.';
     }
     if (erreur.contains('account-exists')) {
-      return 'Un compte existe déjà avec cette adresse. Connecte-toi directement.';
+      return 'An account already exists with this email address. Please sign in directly.';
     }
     if (erreur.contains('too-many-requests')) {
-      return 'Trop de tentatives. Attends quelques minutes et réessaie.';
+      return 'Too many attempts. Please wait a few minutes and try again.';
     }
     if (erreur.contains('Redirection')) {
-      return 'Redirection vers Google en cours...';
+      return 'Redirecting to Google Sign-In...';
     }
-    return 'Une erreur s\'est produite. Réessaie ou contacte le support.';
+    return 'An error occurred. Please try again or contact support.';
   }
 
   void _navigateBasedOnRole(String role, User user) {
@@ -295,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'Authentification Google',
+          _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'Google Authentication',
           style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
@@ -342,7 +341,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
 
                     Text(
-                      _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'Connexion EduTrack',
+                      _selectedRole.isNotEmpty ? _getRoleName(_selectedRole) : 'EduTrack Sign In',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 22,
@@ -353,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 6),
 
                     Text(
-                      'Connectez-vous en un clic avec votre compte Google',
+                      'Sign in with a single click using your Google account',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -386,7 +385,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Vrai logo Google coloré (SVG inline)
+                                // Official Google Logo
                                 SizedBox(
                                   width: 24,
                                   height: 24,
@@ -394,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
-                                  'Se connecter avec Google',
+                                  'Sign in with Google',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -414,7 +413,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Icon(Icons.verified_user_rounded, size: 16, color: Colors.green),
                         const SizedBox(width: 6),
                         Text(
-                          'Connexion sécurisée SSL / Firebase Auth',
+                          'SSL Encrypted / Firebase Auth',
                           style: TextStyle(
                             fontSize: 12,
                             color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),

@@ -128,8 +128,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeNotifier.themeMode,
-          // Localisation en Français (RDC)
-          locale: const Locale('fr', 'FR'),
+          // Default Locale: English
+          locale: const Locale('en', 'US'),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

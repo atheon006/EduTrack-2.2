@@ -44,7 +44,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Profil Super Administrateur'),
+        title: const Text('Super Administrator Profile'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -61,7 +61,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
             TextField(
               controller: photoCtrl,
               decoration: const InputDecoration(
-                labelText: 'URL / Lien de la photo de profil',
+                labelText: 'Profile photo URL',
                 hintText: 'https://...',
                 prefixIcon: Icon(Icons.image_outlined),
                 border: OutlineInputBorder(),
@@ -72,18 +72,18 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.save_rounded),
-            label: const Text('Enregistrer'),
+            label: const Text('Save'),
             onPressed: () async {
               await _service.mettreAJourPhotoProfil(widget.superAdmin.id, photoCtrl.text.trim());
               if (context.mounted) {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Photo de profil enregistrée avec succès !'),
+                    content: Text('Profile photo saved successfully!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -109,14 +109,14 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'EduTrack RDC',
+              'EduTrack',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.primary,
               ),
             ),
             Text(
-              'Super Administrateur',
+              'Super Administrator',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
@@ -127,7 +127,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () => _afficherDialogNotifications(context),
-            tooltip: 'Notifications & Diffusion',
+            tooltip: 'Broadcast & Notifications',
           ),
           PopupMenuButton<String>(
             icon: CircleAvatar(
@@ -153,7 +153,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
                   children: [
                     Icon(Icons.person_outline),
                     SizedBox(width: 8),
-                    Text('Mon profil & Photo'),
+                    Text('My Profile & Photo'),
                   ],
                 ),
               ),
@@ -163,7 +163,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
                   children: [
                     Icon(Icons.logout, color: theme.colorScheme.error),
                     const SizedBox(width: 8),
-                    Text('Se déconnecter',
+                    Text('Sign Out',
                         style: TextStyle(color: theme.colorScheme.error)),
                   ],
                 ),
@@ -182,9 +182,9 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(icon: Icon(Icons.dashboard_outlined), text: 'Vue d\'ensemble'),
-            Tab(icon: Icon(Icons.school_outlined), text: 'Écoles'),
-            Tab(icon: Icon(Icons.people_outline), text: 'Utilisateurs'),
+            Tab(icon: Icon(Icons.dashboard_outlined), text: 'Overview'),
+            Tab(icon: Icon(Icons.school_outlined), text: 'Schools'),
+            Tab(icon: Icon(Icons.people_outline), text: 'Users'),
           ],
         ),
       ),
@@ -242,7 +242,7 @@ class _VueEnsemble extends StatelessWidget {
                   const Icon(Icons.public, color: Colors.white, size: 36),
                   const SizedBox(height: 12),
                   Text(
-                    'Réseau EduTrack RDC',
+                    'EduTrack School Network',
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -250,7 +250,7 @@ class _VueEnsemble extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Année académique 2024–2025',
+                    'Academic Year 2024–2025',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
@@ -261,13 +261,13 @@ class _VueEnsemble extends StatelessWidget {
             const SizedBox(height: 20),
 
             Text(
-              'Statistiques du réseau',
+              'Network Statistics',
               style: theme.textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
 
-            // Grille de stats
+            // Stats Grid
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -278,25 +278,25 @@ class _VueEnsemble extends StatelessWidget {
               children: [
                 _CarteStatistique(
                   icone: Icons.school,
-                  label: 'Écoles',
+                  label: 'Schools',
                   valeur: '${stats['ecoles'] ?? 0}',
                   couleur: Colors.indigo,
                 ),
                 _CarteStatistique(
                   icone: Icons.people,
-                  label: 'Élèves',
+                  label: 'Students',
                   valeur: '${stats['eleves'] ?? 0}',
                   couleur: Colors.teal,
                 ),
                 _CarteStatistique(
                   icone: Icons.person_outline,
-                  label: 'Enseignants',
+                  label: 'Teachers',
                   valeur: '${stats['enseignants'] ?? 0}',
                   couleur: Colors.orange,
                 ),
                 _CarteStatistique(
                   icone: Icons.group,
-                  label: 'Total utilisateurs',
+                  label: 'Total Users',
                   valeur: '${stats['utilisateurs'] ?? 0}',
                   couleur: Colors.purple,
                 ),
@@ -377,7 +377,7 @@ class _GestionEcoles extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _afficherDialogueAjoutEcole(context),
         icon: const Icon(Icons.add),
-        label: const Text('Nouvelle école'),
+        label: const Text('New School'),
       ),
       body: StreamBuilder<List<EcoleRDC>>(
         stream: service.streamToutesLesEcoles(),
@@ -387,7 +387,7 @@ class _GestionEcoles extends StatelessWidget {
           }
           if (snapshot.hasError) {
             return Center(
-              child: Text('Erreur : ${snapshot.error}'),
+              child: Text('Error: ${snapshot.error}'),
             );
           }
           final ecoles = snapshot.data ?? [];
@@ -401,14 +401,14 @@ class _GestionEcoles extends StatelessWidget {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
                   const SizedBox(height: 16),
                   Text(
-                    'Aucune école enregistrée',
+                    'No schools registered',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Appuyez sur + pour ajouter votre première école',
+                    'Tap + to add your first school',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
@@ -478,12 +478,12 @@ class _CarteEcole extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Supprimer l\'école'),
-        content: Text('Es-tu sûr de vouloir supprimer définitivement "${ecole.nom}" ? Cette action est irréversible.'),
+        title: const Text('Delete School'),
+        content: Text('Are you sure you want to permanently delete "${ecole.nom}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Annuler'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
@@ -493,18 +493,18 @@ class _CarteEcole extends StatelessWidget {
                 await service.supprimerEcole(ecole.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('École "${ecole.nom}" supprimée avec succès.')),
+                    SnackBar(content: Text('School "${ecole.nom}" deleted successfully.')),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                    SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
                   );
                 }
               }
             },
-            child: const Text('Supprimer'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -596,7 +596,7 @@ class _CarteEcole extends StatelessWidget {
                         children: [
                           Icon(ecole.estActive ? Icons.pause_circle_outline : Icons.play_circle_outline, size: 18),
                           const SizedBox(width: 8),
-                          Text(ecole.estActive ? 'Désactiver l\'école' : 'Activer l\'école'),
+                          Text(ecole.estActive ? 'Deactivate School' : 'Activate School'),
                         ],
                       ),
                     ),
@@ -606,7 +606,7 @@ class _CarteEcole extends StatelessWidget {
                         children: [
                           Icon(Icons.delete_outline, color: Colors.red, size: 18),
                           SizedBox(width: 8),
-                          Text('Supprimer l\'école', style: TextStyle(color: Colors.red)),
+                          Text('Delete School', style: TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),
@@ -645,7 +645,7 @@ class _CarteEcole extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    ecole.directeurNom ?? 'Aucun directeur nommé',
+                    ecole.directeurNom ?? 'No Principal Assigned',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: ecole.directeurId != null
                           ? null
@@ -656,7 +656,7 @@ class _CarteEcole extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () => _afficherDialogueGenererLien(context, ecole, typeRole: 'directeur'),
                   icon: const Icon(Icons.admin_panel_settings_outlined, size: 14),
-                  label: const Text('Directeur', style: TextStyle(fontSize: 11)),
+                  label: const Text('Principal Link', style: TextStyle(fontSize: 11)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     side: const BorderSide(color: Color(0xFF2563EB)),
@@ -667,7 +667,7 @@ class _CarteEcole extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () => _afficherDialogueGenererLien(context, ecole, typeRole: 'enseignant'),
                   icon: const Icon(Icons.record_voice_over_outlined, size: 14),
-                  label: const Text('Enseignant', style: TextStyle(fontSize: 11)),
+                  label: const Text('Teacher Link', style: TextStyle(fontSize: 11)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     side: const BorderSide(color: Color(0xFF0D9488)),
@@ -1064,7 +1064,7 @@ class _DialogueNommerDirecteurState extends State<_DialogueNommerDirecteur> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: const Text('Cancel'),
         ),
         FilledButton(
           onPressed: _selection == null || _chargement ? null : _nommer,
@@ -1104,7 +1104,7 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
 
     return Column(
       children: [
-        // Barre de recherche & Filtre
+        // Search bar & Filters
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -1113,7 +1113,7 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
                 controller: _searchController,
                 onChanged: (val) => setState(() => _recherche = val.trim().toLowerCase()),
                 decoration: InputDecoration(
-                  hintText: 'Rechercher par nom ou email...',
+                  hintText: 'Search by name or email...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1124,17 +1124,17 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildChipFilter('tous', 'Tous'),
+                    _buildChipFilter('tous', 'All'),
                     const SizedBox(width: 8),
                     _buildChipFilter('superAdmin', 'Super Admin'),
                     const SizedBox(width: 8),
-                    _buildChipFilter('directeur', 'Directeurs'),
+                    _buildChipFilter('directeur', 'Principals'),
                     const SizedBox(width: 8),
-                    _buildChipFilter('enseignant', 'Enseignants'),
+                    _buildChipFilter('enseignant', 'Teachers'),
                     const SizedBox(width: 8),
                     _buildChipFilter('parent', 'Parents'),
                     const SizedBox(width: 8),
-                    _buildChipFilter('eleve', 'Élèves'),
+                    _buildChipFilter('eleve', 'Students'),
                   ],
                 ),
               ),
@@ -1142,7 +1142,7 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
           ),
         ),
 
-        // Liste des utilisateurs
+        // Users list
         Expanded(
           child: StreamBuilder<List<UtilisateurEduTrack>>(
             stream: widget.service.streamTousLesUtilisateurs(),
@@ -1151,7 +1151,7 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
-                return Center(child: Text('Erreur: ${snapshot.error}'));
+                return Center(child: Text('Error: ${snapshot.error}'));
               }
               final users = snapshot.data ?? [];
 
@@ -1170,7 +1170,7 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
                     children: [
                       Icon(Icons.person_search_rounded, size: 64, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
                       const SizedBox(height: 12),
-                      Text('Aucun utilisateur trouvé', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                      Text('No users found', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                     ],
                   ),
                 );
@@ -1260,14 +1260,14 @@ class _GestionUtilisateursState extends State<_GestionUtilisateurs> {
       case 'super_admin':
         return 'Super Admin';
       case 'directeur':
-        return 'Directeur';
+        return 'Principal';
       case 'enseignant':
-        return 'Enseignant';
+        return 'Teacher';
       case 'parent':
         return 'Parent';
       case 'eleve':
       case 'student':
-        return 'Élève';
+        return 'Student';
       default:
         return role;
     }
@@ -1287,7 +1287,7 @@ void _afficherDialogNotifications(BuildContext context) {
         children: [
           Icon(Icons.campaign_rounded, color: Colors.blue),
           SizedBox(width: 8),
-          Text('Diffusion & Notifications', style: TextStyle(fontSize: 16)),
+          Text('Broadcast & Notifications', style: TextStyle(fontSize: 16)),
         ],
       ),
       content: SizedBox(
@@ -1297,14 +1297,14 @@ void _afficherDialogNotifications(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Envoie une notification globale à tous les réseaux d\'écoles de l\'application.',
+              'Send a global broadcast notification to all school networks across the application.',
               style: TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 14),
             TextField(
               controller: titreController,
               decoration: const InputDecoration(
-                labelText: 'Titre du message *',
+                labelText: 'Message Title *',
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
@@ -1314,7 +1314,7 @@ void _afficherDialogNotifications(BuildContext context) {
               controller: messageController,
               maxLines: 3,
               decoration: const InputDecoration(
-                labelText: 'Contenu du message *',
+                labelText: 'Message Content *',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -1324,11 +1324,11 @@ void _afficherDialogNotifications(BuildContext context) {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: const Text('Fermer'),
+          child: const Text('Close'),
         ),
         FilledButton.icon(
           icon: const Icon(Icons.send_rounded, size: 16),
-          label: const Text('Diffuser'),
+          label: const Text('Broadcast'),
           onPressed: () async {
             final titre = titreController.text.trim();
             final msg = messageController.text.trim();
@@ -1340,7 +1340,7 @@ void _afficherDialogNotifications(BuildContext context) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Notification diffusée avec succès à tout le réseau !'),
+                    content: Text('Notification broadcast successfully to the entire network!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -1348,7 +1348,7 @@ void _afficherDialogNotifications(BuildContext context) {
             } catch (e) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red),
+                  SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
                 );
               }
             }
@@ -1360,11 +1360,11 @@ void _afficherDialogNotifications(BuildContext context) {
 }
 
 // ════════════════════════════════════════════
-// DIALOGUE GÉNÉRER LIEN INVITATION UNIQUE
+// GENERATE UNIQUE INVITATION LINK DIALOG
 // ════════════════════════════════════════════
 class _DialogueGenererLienInvitation extends StatefulWidget {
   final EcoleRDC ecole;
-  final String typeRole; // 'directeur' ou 'enseignant'
+  final String typeRole; // 'directeur' or 'enseignant'
 
   const _DialogueGenererLienInvitation({required this.ecole, required this.typeRole});
 
@@ -1391,7 +1391,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez entrer une adresse email valide.')),
+        const SnackBar(content: Text('Please enter a valid email address.')),
       );
       return;
     }
@@ -1419,7 +1419,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erreur: $e'),
+            content: Text('Error: $e'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 5),
           ),
@@ -1432,7 +1432,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
 
   @override
   Widget build(BuildContext context) {
-    final label = _estEnseignant ? 'Enseignant' : 'Directeur / Préfet';
+    final label = _estEnseignant ? 'Teacher' : 'Principal';
     final color = _estEnseignant ? const Color(0xFF0D9488) : const Color(0xFF2563EB);
     final icon = _estEnseignant ? Icons.record_voice_over : Icons.admin_panel_settings;
 
@@ -1443,7 +1443,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Inviter un $label\n${widget.ecole.nom}',
+              'Invite a $label\n${widget.ecole.nom}',
               style: const TextStyle(fontSize: 15),
             ),
           ),
@@ -1457,7 +1457,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
           children: [
             if (_lienGenere == null) ...[
               Text(
-                'Entre l\'adresse email du futur $label. Un lien unique sera généré — il disparaît dès qu\'il est utilisé.',
+                'Enter the email address of the future $label. A unique link will be generated — it disappears once used.',
                 style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 14),
@@ -1465,7 +1465,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: 'Email du $label *',
+                  labelText: '$label Email *',
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.email_outlined),
                 ),
@@ -1484,7 +1484,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Lien généré ! Copie-le et envoie-le. Il disparaît dès la première connexion.',
+                        'Link generated! Copy it and send it. It disappears after the first login.',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
                       ),
                     ),
@@ -1503,7 +1503,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(_lienGenere != null ? 'Fermer' : 'Annuler'),
+          child: Text(_lienGenere != null ? 'Close' : 'Cancel'),
         ),
         if (_lienGenere == null)
           FilledButton.icon(
@@ -1511,7 +1511,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
             icon: _chargement
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.vpn_key),
-            label: const Text('Générer le lien'),
+            label: const Text('Generate Link'),
             style: FilledButton.styleFrom(backgroundColor: color),
           ),
       ],
