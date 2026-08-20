@@ -3,9 +3,9 @@ import '../screens/login_screen.dart';
 import '../screens/parent_signup_screen.dart';
 import '../utils/storage_util.dart';
 
-/// Public Home Screen - Accessible to everyone
-/// Displays Student and Parent portals.
-/// Administration connects discretely via hidden access link.
+/// Écran public d'accueil — visible par tout le monde
+/// Seuls Parent et Élève sont affichés.
+/// L'administration se connecte de façon invisible via son propre lien.
 class RoleSelectionScreen extends StatelessWidget {
   final String schoolName;
   final String schoolToken;
@@ -38,7 +38,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // App Logo Header
+                  // Logo EduTrack
                   Center(
                     child: Container(
                       height: 100,
@@ -82,7 +82,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    'School Management Portal',
+                    'Portail Scolaire',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -92,12 +92,12 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
 
-                  // ── Student ────────────────────────────────
+                  // ── Élève ──────────────────────────────────
                   _buildRoleButton(
                     context: context,
                     role: 'student',
-                    label: 'I am a Student',
-                    subtitle: 'Check grades, homework, and schedule',
+                    label: 'Je suis Élève',
+                    subtitle: 'Consulte tes notes, devoirs et emploi du temps',
                     icon: Icons.menu_book_rounded,
                     color: const Color(0xFFD97706),
                     isDark: isDark,
@@ -108,15 +108,15 @@ class RoleSelectionScreen extends StatelessWidget {
                   _buildRoleButton(
                     context: context,
                     role: 'parent',
-                    label: 'I am a Parent / Guardian',
-                    subtitle: 'Track your child\'s academic progress',
+                    label: 'Je suis Parent / Tuteur',
+                    subtitle: 'Suis la scolarité de ton enfant',
                     icon: Icons.family_restroom_rounded,
                     color: const Color(0xFF7C3AED),
                     isDark: isDark,
                   ),
                   const SizedBox(height: 32),
 
-                  // ── Parent Sign Up Button ──────────────────
+                  // ── Inscription Parent ─────────────────────
                   OutlinedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -126,7 +126,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     },
                     icon: const Icon(Icons.person_add_alt_1_rounded, size: 20),
                     label: const Text(
-                      'Create Parent Account',
+                      'Créer un compte Parent',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -142,12 +142,12 @@ class RoleSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // Discreet Administration Access Link
+                  // Lien discret d'accès administration (long press sur le copyright)
                   GestureDetector(
                     onLongPress: () => _accesAdministration(context),
                     child: Center(
                       child: Text(
-                        '© EduTrack System',
+                        '© EduTrack RDC',
                         style: TextStyle(
                           fontSize: 11,
                           color: isDark
