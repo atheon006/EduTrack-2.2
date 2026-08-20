@@ -141,12 +141,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           ],
           home: const SplashScreen(),
           onGenerateRoute: (settings) {
-            final uri = Uri.parse(settings.name ?? '');
-            if (uri.path == '/invite' || uri.path == '/#/invite') {
-              final token = uri.queryParameters['token'] ?? '';
-              return MaterialPageRoute(
-                builder: (_) => InviteActivationScreen(token: token),
-              );
+            final name = settings.name ?? '';
+            if (name.contains('/invite/')) {
+              final token = name.split('/invite/').last.split('?').first.split('#').first;
+              if (token.isNotEmpty) {
+                return MaterialPageRoute(
+                  builder: (_) => InviteActivationScreen(token: token),
+                );
+              }
             }
             return null;
           },
@@ -172,7 +174,34 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkLoginStatus() async {
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Check if browser opened an invitation link directly
+      final baseUri = Uri.base;
+      final path = baseUri.path;
+      final fragment = baseUri.fragment;
+
+      String? inviteToken;
+      if (path.contains('/invite/')) {
+        inviteToken = path.split('/invite/').last.split('?').first.split('#').first;
+      } else if (fragment.contains('/invite/')) {
+        inviteToken = fragment.split('/invite/').last.split('?').first;
+      } else if (baseUri.queryParameters.containsKey('token')) {
+        inviteToken = baseUri.queryParameters['token'];
+      }
+
+      if (inviteToken != null && inviteToken.isNotEmpty) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InviteActivationScreen(token: inviteToken!),
+            ),
+          );
+          return;
+        }
+      }
+
       final isLoggedIn = await StorageUtil.getBool('isLoggedIn') ?? false;
 
       if (kDebugMode) {
