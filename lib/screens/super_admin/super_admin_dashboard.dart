@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/ecole_rdc_model.dart';
 import '../../models/classe_rdc_model.dart';
 import '../../models/utilisateur_model.dart';
@@ -1432,7 +1433,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
 
   @override
   Widget build(BuildContext context) {
-    final label = _estEnseignant ? 'Teacher' : 'Principal';
+    final label = _estEnseignant ? 'Enseignant' : 'Directeur / Préfet';
     final color = _estEnseignant ? const Color(0xFF0D9488) : const Color(0xFF2563EB);
     final icon = _estEnseignant ? Icons.record_voice_over : Icons.admin_panel_settings;
 
@@ -1443,7 +1444,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Invite a $label\n${widget.ecole.nom}',
+              'Inviter un $label\n${widget.ecole.nom}',
               style: const TextStyle(fontSize: 15),
             ),
           ),
@@ -1457,7 +1458,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
           children: [
             if (_lienGenere == null) ...[
               Text(
-                'Enter the email address of the future $label. A unique link will be generated — it disappears once used.',
+                'Entre l\'adresse email du futur $label. Un lien unique sera généré — il disparaît dès qu\'il est utilisé.',
                 style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 14),
@@ -1465,7 +1466,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: '$label Email *',
+                  labelText: 'Email du $label *',
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.email_outlined),
                 ),
@@ -1484,7 +1485,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Link generated! Copy it and send it. It disappears after the first login.',
+                        'Lien généré avec succès ! Copie-le et envoie-le.',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
                       ),
                     ),
@@ -1492,9 +1493,44 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                 ),
               ),
               const SizedBox(height: 14),
-              SelectableText(
-                _lienGenere!,
-                style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: color),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SelectableText(
+                        _lienGenere!,
+                        style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: color, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: _lienGenere!));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('📋 Lien d\'invitation copié dans le presse-papier !'),
+                            backgroundColor: Colors.green,
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.copy_rounded, size: 16),
+                      label: const Text('Copier', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: color,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ],
@@ -1503,7 +1539,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(_lienGenere != null ? 'Close' : 'Cancel'),
+          child: Text(_lienGenere != null ? 'Fermer' : 'Annuler'),
         ),
         if (_lienGenere == null)
           FilledButton.icon(
@@ -1511,7 +1547,7 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
             icon: _chargement
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.vpn_key),
-            label: const Text('Generate Link'),
+            label: const Text('Générer le lien'),
             style: FilledButton.styleFrom(backgroundColor: color),
           ),
       ],
