@@ -1549,6 +1549,22 @@ class _DialogueGenererLienInvitationState extends State<_DialogueGenererLienInvi
                 : const Icon(Icons.vpn_key),
             label: const Text('Générer le lien'),
             style: FilledButton.styleFrom(backgroundColor: color),
+          )
+        else
+          FilledButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: _lienGenere!));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('📋 Lien d\'invitation copié dans le presse-papier !'),
+                  backgroundColor: Colors.green,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            },
+            icon: const Icon(Icons.copy_rounded),
+            label: const Text('Copier le lien'),
+            style: FilledButton.styleFrom(backgroundColor: color),
           ),
       ],
     );
