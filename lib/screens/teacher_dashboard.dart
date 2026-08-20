@@ -8,6 +8,7 @@ import '../services/image_service.dart' as image_service;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/storage_util.dart';
+import '../services/firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this import
 import 'teachers/teacher_classes_screen.dart';
 import 'teachers/teacher_assignments_screen.dart';
@@ -182,10 +183,19 @@ class _TeacherDashboardState extends State<TeacherDashboard> with TickerProvider
     }
   }
 
-  // Update this method to match school admin implementation exactly
   Future<void> _fetchSchoolStories() async {
     try {
-      final schoolId = await StorageUtil.getString('schoolId') ?? '';
+      var schoolId = await StorageUtil.getString('schoolId') ?? widget.user.schoolToken;
+      if (schoolId.isEmpty) {
+        final firestoreService = FirestoreServiceRDC();
+        final userDoc = await firestoreService.getUtilisateur(widget.user.id);
+        if (userDoc != null && (userDoc.schoolId ?? '').isNotEmpty) {
+          schoolId = userDoc.schoolId!;
+          await StorageUtil.setString('schoolId', schoolId);
+          await StorageUtil.setString('schoolToken', schoolId);
+        }
+      }
+
       if (schoolId.isEmpty) {
         print('⚠️ School ID not found in storage');
         setState(() {
